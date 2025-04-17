@@ -1,0 +1,39 @@
+body {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: #fff;
+    overflow-x: hidden;
+}
+
+a {
+    color: black;
+}
+
+li {
+    text-decoration: none;
+}
+
+.nav-btn:hover {
+    width: 140px;
+    height: 40px;
+    border-radius: 24.5px;
+    background-color: #4A6BF2;
+    text-align: center;
+    color: white;
+}
+
+.nav-link.active {
+    width: 140px;
+    height: 40px;
+    border-radius: 24.5px;
+    background-color: #4A6BF2;
+    text-align: center;
+    color: white;
+}
+
+.navigation-style {
+    border-bottom: 2px solid #4967B7;
+    background-color: #fff;
+    padding: 5px
+}
