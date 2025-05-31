@@ -4,40 +4,53 @@
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card border-primary shadow-lg" style="width: 700px; height:auto;">
         <div class="card-body  p-4">
-            <h1 class="text-center mb-4 mt-4">Hello Tenant</h1>
+            <h1 class="text-center mb-4 mt-4 text-create">Hello Tenant</h1>
+            <p class="text-center mb-4 text-muted">Welcome back! Please log in to explore available boarding houses and
+                manage your bookings.</p>
+
             <form method="POST">
                 @csrf
-                <div class="containier mt-5">
+                <div class="row mt-4">
+                    <div class="mt-2">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-control"
+                            placeholder="Email Address" required style="border: 2px solid #4edce2;">
 
-                    <div class="mb-3 mt-3 d-flex justify-content-center align-items-center">
-                        <input type="email" name="email" id="email" class="form-control w-75"
-                            placeholder="Email Address" required>
                     </div>
-                    <div class="mb-3 mt-4 d-flex justify-content-center">
-                        <div class="input-group w-75">
+                    <!-- Email Column -->
+
+                    <!-- Password Column -->
+                    <div class="mt-2">
+
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
                             <input type="password" id="password" name="password" class="form-control"
-                                placeholder="Password" required>
-                            <span class="input-group-text bg-transparent border-start-0">
+                                placeholder="Password" required style="border: 2px solid #4edce2;">
+                            <span class="input-group-text bg-transparent border-start-0"
+                                style="border: 2px solid #4edce2;">
                                 <i id="togglePassword" class="fas fa-eye fs-5" style="cursor: pointer;"></i>
                             </span>
                         </div>
                     </div>
                 </div>
-                <div class="container d-flex justify-content-center">
-                    <div class=" gap-2   w-50">
-                        <button type="submit"
-                            class="btn btn-primary rounded-pill d-flex justify-content-center align-items-center w-100">Sign
-                            In</button>
-                    </div>
-                </div>
-            </form>
-            <p class="text-center mt-5">
-                Hello Tenant! Don't have an account?
-                <a href="{{ route('register-tenant') }}" class="text-primary">Sign up here.</a>
-            </p>
+
 
 
         </div>
+        <div class="container d-flex justify-content-center">
+            <div class=" gap-2   w-50">
+                <button type="submit"
+                    class="btn rounded-pill d-flex justify-content-center align-items-center w-100">Sign
+                    In</button>
+            </div>
+        </div>
+        </form>
+        <p class="text-center mt-5">
+            Hello Tenant! Don't have an account?
+            <a href="{{ route('register-tenant') }}" class="text-primary">Sign up here.</a>
+        </p>
+
+
     </div>
 </div>
 

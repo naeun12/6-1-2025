@@ -41,6 +41,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'landlord' => [
+        'driver' => 'session',
+        'provider' => 'landlords',
+    ],
     ],
 
     /*
@@ -65,6 +69,10 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+        'landlords' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\landlord\landlordAccountModel::class,
+    ],
 
         // 'users' => [
         //     'driver' => 'database',

@@ -23,8 +23,8 @@
             <div class="row px-4">
                 <div class="col-md-6 mb-3">
                     <label for="firstname" class="form-label">First Name</label>
-                    <input type="text" id="firstname" name="firstname" v-model="firstname"
-                        class="form-control border-primary" placeholder="Enter your First Name">
+                    <input type="text" id="firstname" name="firstname" v-model="firstname" class="form-control "
+                        style="border: 2px solid #4edce2 ;" placeholder="Enter your First Name">
                     <span v-if="errors.firstname" class="error">{{ errors.firstname[0] }}</span>
 
 
@@ -33,8 +33,8 @@
 
                 <div class="col-md-6 mb-3">
                     <label for="lastname" class="form-label">Last Name</label>
-                    <input type="text" id="lastname" name="lastname" v-model="lastname"
-                        class="form-control border-primary" placeholder="Enter your Last Name" required>
+                    <input type="text" id="lastname" name="lastname" v-model="lastname" class="form-control"
+                        style="border: 2px solid #4edce2 ;" placeholder="Enter your Last Name" required>
                     <span v-if="errors.lastname" class="error">{{ errors.lastname[0] }}</span>
 
                 </div>
@@ -43,8 +43,8 @@
             <!-- Email -->
             <div class="mb-3 px-4">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" v-model="email" class="form-control border-primary"
-                    placeholder="Enter your Email Address" required>
+                <input type="email" id="email" name="email" style="border: 2px solid #4edce2 ;" v-model="email"
+                    class="form-control " placeholder="Enter your Email Address" required>
                 <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
 
             </div>
@@ -53,15 +53,15 @@
             <div class="row px-4">
                 <div class="col-md-6 mb-0">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" v-model="password"
-                        class="form-control border-primary" placeholder="Enter your Password" required>
+                    <input type="password" id="password" name="password" v-model="password" class="form-control "
+                        style="border: 2px solid #4edce2 ;" placeholder="Enter your Password" required>
                     <span class="error" v-if="errors.password">{{ errors.password[0] }}</span>
 
                 </div>
                 <div class="col-md-6 mb-0">
                     <label for="confirm_password" class="form-label">Confirm Password</label>
                     <input type="password" id="confirm_password" name="password_confirmation"
-                        v-model="password_confirmation" class="form-control border-primary"
+                        v-model="password_confirmation" class="form-control " style="border: 2px solid #4edce2 ;"
                         placeholder="Confirm your Password" required>
                     <span v-if="errors.password_confirmation" class="error">{{ errors.password_confirmation[0] }}</span>
                 </div>
@@ -79,8 +79,8 @@
             <!-- Phone Number -->
             <div class="mb-3 px-4">
                 <label for="phonenumber" class="form-label">Phone Number</label>
-                <input type="tel" id="phonenumber" name="phonenumber" v-model="phonenumber"
-                    class="form-control border-primary" placeholder="Enter your Phone Number" required
+                <input type="tel" id="phonenumber" name="phonenumber" v-model="phonenumber" class="form-control"
+                    style="border: 2px solid #4edce2 ;" placeholder="Enter your Phone Number" required
                     pattern="^(?:\+63|09)\d{9}$">
 
                 <span v-if="errors.phonenumber" class="error">{{ errors.phonenumber[0] }}</span>
@@ -90,7 +90,8 @@
             <!-- Gender -->
             <div class="mb-3 px-4">
                 <label for="gender" class="form-label">Gender</label>
-                <select id="gender" name="gender" v-model="gender" class="form-select border-primary" required>
+                <select id="gender" name="gender" v-model="gender" class="form-select"
+                    style="border: 2px solid #4edce2 ;" required>
                     <option value="">-- Select Gender --</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -103,8 +104,8 @@
                 <!-- Region -->
                 <div class="col-md-4 mb-3">
                     <label for="region" class="form-label">Region</label>
-                    <select id="region" v-model="selectedRegion" class="form-select border-primary"
-                        @change="updateProvinces">
+                    <select id="region" v-model="selectedRegion" class="form-select "
+                        style="border: 2px solid #4edce2 ;" @change="updateProvinces">
                         <option value="">-- Select Region --</option>
                         <option v-for="(name, code) in regions" :key="code" :value="code">{{ name }}</option>
                     </select>
@@ -113,8 +114,8 @@
 
                 <div class="col-md-4 mb-3">
                     <label for="province" class="form-label">Province</label>
-                    <select id="province" v-model="selectedProvince" class="form-select border-primary"
-                        @change="updateCities">
+                    <select id="province" v-model="selectedProvince" class="form-select "
+                        style="border: 2px solid #4edce2 ;" @change="updateCities">
                         <option value="">-- Select Province --</option>
                         <option v-if="provinces.length === 0" disabled>No provinces available</option>
                         <option v-for="province in provinces" :key="province" :value="province">{{ province }}</option>
@@ -126,7 +127,7 @@
 
                 <div class="col-md-4 mb-3">
                     <label for="city" class="form-label">City</label>
-                    <select id="city" v-model="selectedCity" class="form-select border-primary">
+                    <select id="city" v-model="selectedCity" class="form-select " style="border: 2px solid #4edce2 ;">
                         <option value="">-- Select City --</option>
                         <option v-if="cities.length === 0" disabled>No City available</option>
                         <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
@@ -136,19 +137,19 @@
             </div>
             <div class="mb-3 px-4">
                 <label for="postal_code" class="form-label">Postal Code</label>
-                <input type="text" id="postalcode" name="postalcode" v-model="postalcode"
-                    class="form-control border-primary" placeholder="Postal Code" required>
+                <input type="text" id="postalcode" name="postalcode" v-model="postalcode" class="form-control "
+                    style="border: 2px solid #4edce2 ;" placeholder="Postal Code" required>
                 <span class="error" v-if="errors.postalcode">{{ errors.postalcode[0] }}</span>
             </div>
 
             <div class="mb-3 px-4">
                 <label for="current_address" class="form-label">Current Address</label>
-                <textarea id="current_address" name="currentaddress" v-model="currentaddress"
-                    class="form-control border-primary" rows="3" placeholder="Current Address" required></textarea>
+                <textarea id="current_address" name="currentaddress" v-model="currentaddress" class="form-control "
+                    style="border: 2px solid #4edce2 ;" rows="3" placeholder="Current Address" required></textarea>
                 <span class="error" v-if="errors.currentaddress">{{ errors.currentaddress[0] }}</span>
             </div>
             <div class="d-flex justify-content-center mb-4">
-                <button type="button" @click="openModal" class="btn btn-primary w-50">Sign-up</button>
+                <button type="button" @click="openModal" class="btn  w-50 sign-in-style">Sign-in</button>
             </div>
 
 
@@ -232,12 +233,11 @@
         </div>
     </div>
 
+
     <div v-if="isLoading" class="loader-overlay">
         <div class="d-flex flex-column align-items-center justify-content-center h-100">
-            <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3 text-muted">Please wait...</p>
+            <img :src="'/images/MoreImages/sendingEmail.gif'" alt="Sending Email" class="email-gif mb-3 w-25">
+            <p class="mt-3 text-muted animated-text">Sending email, please wait...</p>
         </div>
     </div>
 </template>
@@ -490,6 +490,7 @@ export default {
                         if (success) {
                             this.modalVisible = true;
                             document.body.style.overflow = "hidden";
+
                         }
                     })
                     .catch((error) => {
@@ -537,19 +538,8 @@ export default {
                         this.toastgmailvisible = false;
 
                     }, 10000);
-                    const expirationTime = new Date(response.data.timer);
-                    const currentTime = new Date();
-                    let remainingSeconds = Math.floor((expirationTime - currentTime) / 1000);
-                    this.otpTimer = remainingSeconds;
-                    const interval = setInterval(() => {
-                        if (remainingSeconds <= 0) {
-                            clearInterval(interval);
-                            this.otpTimer = 0;
-                            return;
-                        }
-                        this.otpTimer = remainingSeconds;
-                        remainingSeconds--;
-                    }, 1000);
+                    this.startOtpTimer(response.data.timer);
+
                     return true;
                 }
             }
@@ -638,9 +628,9 @@ export default {
         },
         async resendOtp() {
             try {
-                this.isReadingfalse = false;
                 this.errors = {};
                 this.errorMessage = '';
+                this.otpTimer = 0;
                 const requestData = {
                     email: this.email.trim(),
                 }
@@ -652,19 +642,9 @@ export default {
                     setTimeout(() => {
                         this.toastgmailvisible = false;
                     }, 10000);
-                    const expirationTime = new Date(response.data.timer);
-                    const currentTime = new Date();
-                    let remainingSeconds = Math.floor((expirationTime - currentTime) / 1000);
-                    this.otpTimer = remainingSeconds;
-                    const interval = setInterval(() => {
-                        if (remainingSeconds <= 0) {
-                            clearInterval(interval);
-                            this.otpTimer = 0;
-                            return;
-                        }
-                        this.otpTimer = remainingSeconds;
-                        remainingSeconds--;
-                    }, 1000);
+                    this.startOtpTimer(response.data.timer);
+
+
                 }
 
             }
@@ -730,6 +710,27 @@ export default {
 
 
         },
+        startOtpTimer(timerValue) {
+            const expirationTime = new Date(timerValue);
+            const currentTime = new Date();
+            let remainingSeconds = Math.floor((expirationTime - currentTime) / 1000);
+
+            this.otpTimer = remainingSeconds;
+
+            if (this.otpInterval) {
+                clearInterval(this.otpInterval);
+            }
+
+            this.otpInterval = setInterval(() => {
+                if (remainingSeconds <= 0) {
+                    clearInterval(this.otpInterval);
+                    this.otpTimer = 0;
+                } else {
+                    this.otpTimer = remainingSeconds;
+                    remainingSeconds--;
+                }
+            }, 1000);
+        },
 
 
         fill() {
@@ -770,324 +771,4 @@ export default {
 
 
 </script>
-<style scoped>
-.error {
-    color: red;
-    font-size: 12px;
-}
-
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(152, 133, 133, 0.8);
-    opacity: 0.3;
-    z-index: 999;
-}
-
-.custom-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 500px;
-    /* Adjust as needed */
-    max-width: 90%;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
-}
-
-.modal-header .modal-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
-.modal-header .btn-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-/* Modal Body */
-.modal-body {
-    padding: 1rem;
-    text-align: center;
-}
-
-
-
-/* OTP Inputs */
-.otp-inputs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-}
-
-.otp-box {
-    width: 40px;
-    height: 40px;
-    text-align: center;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-}
-
-.otp-box:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Modal Actions */
-.modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-.modal-actions .btn {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.modal-actions .btn-primary {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-}
-
-.modal-actions .btn-success {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-}
-
-.loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    /* Semi-transparent white */
-    z-index: 1050;
-    /* Ensure it's above other content */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.spinner-border {
-    width: 4rem;
-    height: 4rem;
-}
-
-/* Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    /* darker transparent background */
-    z-index: 999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Modal Container */
-.modal-container {
-    background-color: #fff;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-    padding: 20px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
-    position: relative;
-    animation: fadeIn 0.3s ease;
-}
-
-/* Fade-in Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Modal Header */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.modal-header h2 {
-    font-size: 24px;
-    color: #333;
-    margin: 0;
-}
-
-.close-button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #007bff;
-}
-
-/* Confirmation Box */
-.confirmation-box {
-    text-align: center;
-}
-
-.confirmation-box h3 {
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Checkmark (optional SVG style) */
-.checkmark {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 15px;
-    animation: rotate 1s ease-in-out;
-
-}
-
-.ok-button {
-    background-color: transparent;
-    border: 2px solid #22ff00;
-    color: #000000;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.ok-button:hover {
-    background-color: #5bfd04;
-    color: #fff;
-}
-
-/* Base Styles */
-.container-toast {
-    position: fixed;
-    top: 7rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 95%;
-    max-width: 30rem;
-    z-index: 1000;
-    transition: all 0.5s ease;
-    /* Smooth transition for all properties */
-    opacity: 0;
-}
-
-.toast-child {
-
-    border-radius: 0.5rem;
-    /* Rounded corners */
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    /* Subtle shadow */
-    overflow: hidden;
-    /* Prevent content from overflowing */
-    transition: all 0.5s ease;
-    /* Smooth transition for all properties */
-
-
-
-
-}
-
-@keyframes slideDownBounce {
-    0% {
-        top: -10rem;
-        opacity: 0;
-    }
-
-    70% {
-        top: 8rem;
-        /* Overshoot slightly */
-    }
-
-    100% {
-        top: 7rem;
-        opacity: 1;
-    }
-}
-
-.container-toast.show {
-    animation: slideDownBounce 0.6s ease forwards;
-}
-
-.toast-body {
-    font-size: 1rem;
-    /* Default font size */
-}
-
-/* Responsive Font Sizes */
-@media (max-width: 768px) {
-    .toast-body {
-        font-size: 0.9rem;
-        /* Smaller font size for tablets and smaller devices */
-    }
-}
-
-@media (max-width: 576px) {
-    .toast-body {
-        font-size: 0.8rem;
-        /* Even smaller font size for mobile devices */
-    }
-
-    .container-toast {
-        width: 100%;
-        /* Full width on very small screens */
-        padding: 0 1rem;
-        /* Add horizontal padding for better spacing */
-    }
-}
-
-/* Button Styling */
-.btn-close {
-    margin-left: 1rem;
-    /* Add spacing between text and close button */
-}
-</style>
+<style scoped></style>

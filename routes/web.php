@@ -5,11 +5,35 @@ use App\Http\Controllers\landingPageController;
 use App\Http\Middleware\AfterRegistrationMiddleware;
 
 use App\Http\Controllers\tenant\accountprocessController;
-//view landingpage and register
+use App\Http\Controllers\landloard\accountprocesslandlordController;
+use App\Http\Controllers\landloard\auth\dashboard;
+use App\Http\Controllers\landloard\auth\dormManagementController;
+use App\Http\Controllers\landloard\auth\roomManagementController;
+use App\Http\Controllers\landloard\auth\TenantController;
+use App\Http\Controllers\landloard\auth\tenantScreeningController;
+use App\Http\Controllers\landloard\auth\AnalyticsController;
+use App\Http\Controllers\landloard\auth\MessagingCenterController;
+use App\Http\Controllers\landloard\auth\NotificationController;
+use App\Http\Controllers\landloard\auth\ReviewandFeedbackController;
+use App\Http\Controllers\landloard\auth\BookingController;
+use App\Models\Landlord;
+
+
+
+
+
+use App\Http\Middleware\LandlordAuth;
+
+
+//view landingpage, login and register for landlord and tenant
 Route::get('/', [landingPageController::class, 'landingPage'])->name('landingpage');
 Route::get('/tenantLogin', [accountprocessController::class, 'login'])->name('login-tenant');
 Route::get('/tenantRegister', [accountprocessController::class, 'register'])->name('register-tenant');
+Route::get('/landlordLogin', [accountprocesslandlordController::class, 'landlordLogin'])->name('landlord-Login');
+Route::post('/logout', [accountprocesslandlordController::class, 'logout'])->name('logout');
 
+
+Route::get('/landlordregister', [accountprocesslandlordController::class, 'landlordRegister'])->name('register-landlord');
 //Route::get('/verify', [accountprocessController::class, 'startVerification'])->name('verify-otp');
 
 Route::post('/verify-registration', [accountprocessController::class, 'verifyRegistration'])->name('verify.registration');
@@ -19,8 +43,49 @@ Route::post('/verify-registration', [accountprocessController::class, 'verifyReg
 
 Route::match(['get', 'post'], '/SendOtp', [accountprocessController::class, 'SendOtp'])->name('SendOtp');
 Route::match(['get', 'post'], '/resendOtp', [accountprocessController::class, 'resendOtp'])->name('resendOtp');
-
-
 Route::match(['get', 'post'], '/registerTenant', [accountprocessController::class, 'registerTenant'])->name('registerTenant');
 
+//landlord login
+Route::match(['get', 'post'], '/loginLandlord', [accountprocesslandlordController::class, 'loginLandlord'])->name('loginLandlord');
 
+
+
+//landlord
+
+Route::match(['get', 'post'], '/personalDetails', [accountprocesslandlordController::class, 'personalDetails'])->name('stepOne');
+Route::post('/IdentityVerifaction', [accountprocesslandlordController::class, 'IdentityVerifaction'])->name('IdentityVerifaction');
+Route::post('/businessPermitValidation', [accountprocesslandlordController::class, 'businessPermitValidation'])->name('businessPermitValidation');
+Route::post('/RegisterLandlord', [accountprocesslandlordController::class, 'RegisterLandlord'])->name('RegisterLandlord');
+
+//landlord auth
+
+Route::middleware([LandlordAuth::class])->group(function () {
+    Route::match(['get', 'post'], '/landlordDashboard', [dashboard::class, 'landlordDashboard'])->name('landlordDashboard');
+    Route::match(['get', 'post'], '/landlordDormManagement/{landlordId}', [dormManagementController::class, 'DormManagement'])->name('landlordDormManagement');
+    Route::match(['get', 'post'], '/landlordRoomManagement/{landlordId}', [roomManagementController::class, 'RoomManagement'])->name('landlordRoomManagement');
+    Route::match(['get', 'post'], '/tenant', [TenantController::class, 'tenant'])->name('tenant');
+    Route::match(['get', 'post'], '/tenantScreening', [tenantScreeningController::class, 'tenantScreening'])->name('tenantScreening');
+    Route::match(['get', 'post'], '/BookingPage', [BookingController::class, 'BookingPage'])->name('BookingPage');
+    Route::match(['get', 'post'], '/AnalyticsPage', [AnalyticsController::class, 'AnalyticsPage'])->name('AnalyticsPage');
+    Route::match(['get', 'post'], '/MessagingPage', [MessagingCenterController::class, 'MessagingPage'])->name('MessagingPage');
+    Route::match(['get', 'post'], '/ReviewandFeedback', [ReviewandFeedbackController::class, 'ReviewandFeedback'])->name('ReviewandFeedback');
+    Route::match(['get', 'post'], '/NotificationPage', [NotificationController::class, 'NotificationPage'])->name('NotificationPage');
+
+    //functions for landlord dorm management
+    Route::post('/AddDorm', [dormManagementController::class, 'AddDorm'])->name('AddDorm');
+    Route::post('/UpdateDorm/{id}', [dormManagementController::class, 'UpdateDorm'])->name('UpdateDorm');
+    Route::delete('/DeleteDorm/{id}', [dormManagementController::class, 'DeleteDorm'])->name('DeleteDorm');
+    Route::get('/ListDorms', [dormManagementController::class, 'ListDorms'])->name('ListDorms');
+    Route::get('/ViewDorm/{id}', [dormManagementController::class, 'ViewDorm'])->name('ViewDorm');
+    Route::get('/SearchDorms', [dormManagementController::class, 'searchDorms'])->name('SearchDorms');
+    //functions for landlord room management
+    Route::post('/addRoom', [roomManagementController::class, 'addRoom'])->name('addRoom');
+    Route::post('/UpdateRoom/{id}', [roomManagementController::class, 'UpdateRoom'])->name('UpdateRoom');
+    Route::delete('/DeleteRoom/{id}', [roomManagementController::class, 'DeleteRoom'])->name('DeleteRoom');
+    Route::get('/ListRooms', [roomManagementController::class, 'ListRooms'])->name('ListRooms');
+    Route::get('/ViewRoom/{id}', [roomManagementController::class, 'ViewRoom'])->name('ViewRoom');
+    Route::get('/SearchRooms', [roomManagementController::class, 'searchRooms'])->name('SearchRooms');
+    //functions for amenities
+    Route::post('/add-amenities', [dormManagementController::class, 'AddAmenities'])->name('add.amenities');
+    Route::delete('/delete-amenities/{id}', [dormManagementController::class, 'DeleteAmenities'])->name('delete.amenities');
+});

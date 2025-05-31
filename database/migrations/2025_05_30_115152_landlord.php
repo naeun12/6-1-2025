@@ -9,10 +9,10 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+    public function up(): void
     {
-        Schema::create('tenants', function (Blueprint $table) {
-            $table->string('tenant_id')->unique()->primary();
+            Schema::create('landlords', function (Blueprint $table) {
+            $table->string('landlord_id')->unique()->primary();
             $table->string('firstname', 55); 
             $table->string('lastname', 55); 
             $table->string('password_hash', 255);
@@ -20,23 +20,25 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phonenumber', 11)->unique(); 
             $table->enum('gender', ['Female', 'Male']); 
-            $table->string('city', 255); 
-            $table->string('province', 255); 
-            $table->string('region', 255); 
-            $table->string('currentaddress', 255); 
-            $table->string('postalcode', 4); 
-             $table->string('role')->default('tenant'); 
+            $table->string('role')->default('landlord'); 
             $table->string('profile_pic_url', 255)->nullable(); 
+            $table->string('goverment_id', 255)->nullable(); 
+            $table->string('business_permit', 255)->nullable(); 
+            $table->boolean('verify_account')->default(false); 
+
             $table->rememberToken();
             $table->timestamps(); 
         });
     }
+
+    
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('tenants');
+                Schema::dropIfExists('landlords');
+
     }
 };

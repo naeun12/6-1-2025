@@ -15,25 +15,31 @@ li {
 }
 
 .nav-btn:hover {
-    width: 140px;
+    width: 100px;
     height: 40px;
     border-radius: 24.5px;
-    background-color: #4A6BF2;
+    background-color: #4edce2;
     text-align: center;
     color: white;
 }
 
-.nav-link.active {
-    width: 140px;
-    height: 40px;
-    border-radius: 24.5px;
-    background-color: #4A6BF2;
-    text-align: center;
-    color: white;
-}
+
 
 .navigation-style {
-    border-bottom: 2px solid #4967B7;
+    border-bottom: 2px solid #4edce2;
     background-color: #fff;
     padding: 5px
+}
+
+.logo-text {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 29px;
+    letter-spacing: -3.2px;
+    word-spacing: -2.8px;
+    color: #4edce2;
+    font-weight: 700;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: small-caps;
+    text-transform: capitalize;
 }

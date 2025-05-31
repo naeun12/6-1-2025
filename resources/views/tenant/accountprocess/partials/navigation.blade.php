@@ -2,10 +2,9 @@
 <header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid navigation-style">
-            <a class="navbar-brand text-black px-3 d-flex align-items-center" href="#">
+            <a class="navbar-brand text-black px-2 d-flex align-items-center" href="{{ route('landingpage') }}">
                 <img src="{{ asset('images/Logo/logo.png') }}" class="rounded-circle" alt="Company Logo" width="75">
-                <span class="ml-3"
-                    style="font-family: 'Poppins', sans-serif; font-weight: bold; font-size: 24px; color: #2c3e50; text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); letter-spacing: 1px;">
+                <span class="ml-2 logo-text">
                     DormHub
                 </span>
             </a>
@@ -30,7 +29,11 @@
                     </li>
                 </ul>
             </div>
+            <button class="btn py-3 "> <a href="{{ route('landlord-Login') }}"
+                    class="text-decoration-none">Landlord</a></button>
         </div>
+
     </nav>
 </header>
+
 <!-- Include the Vite-compiled CSS and JS files -->

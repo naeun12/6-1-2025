@@ -9,31 +9,25 @@
     border-radius: 5px;
 }
 
-a {
-    color: black;
-}
+
 
 .nav-btn:hover {
-    width: 140px;
+    width: 100px;
     height: 40px;
     border-radius: 24.5px;
-    background-color: #4A6BF2;
+    background-color: #4edce2;
     text-align: center;
     color: white;
 }
 
 .nav-link.active {
-    width: 140px;
+    width: 100px;
     height: 40px;
     border-radius: 24.5px;
-    background-color: #4A6BF2;
+    background-color: #4edce2;
     text-align: center;
     color: white;
 }
-
-
-
-
 
 .container-fluid {
     background-color: #fff;
@@ -63,13 +57,14 @@ p {
     border-radius: 25px;
     box-shadow: #777 0px 25px 20px -20px;
     transition: transform 1s ease, box-shadow 0.3s ease;
+    background-color: #4edce2;
 }
 
 .btn:hover {
 
-
+    background-color: #093334;
+    color: white;
     transform: scale(1.1);
-    width: 160px;
     box-shadow: 0px 10px 15px -5px #555;
 }
 
@@ -83,7 +78,7 @@ p {
     /* Ensure full width within the column */
     height: 500px;
     background-color: #fff;
-    border: 2px solid #007bff;
+    border: 2px solid #4edce2;
     border-radius: 8px;
     overflow: hidden;
     display: flex;
@@ -162,22 +157,14 @@ p {
     transition: background-color 0.3s ease;
 }
 
-@keyframes appear {
-    from {
-        opacity: 0;
-        scale: 0.5;
-    }
-
-    to {
-        opacity: 1;
-        scale: 1;
-    }
+.dropdown-menu .dropdown-item:hover {
+    background-color: #4edce2;
+    color: white;
 }
 
-.section {
-    animation: appear linear;
-    animation-timeline: view();
-    animation-range: entry 0 cover 40%;
+.nav-link.dropdown-toggle:hover {
+    color: white;
+
 }
 
 .view-details-btn:hover {
@@ -189,5 +176,13 @@ p {
 @media (max-width: 768px) {
     .col-md-6 {
         text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-top: 2rem;
+        /* Adjust for smaller screens */
+        padding-bottom: 2rem;
     }
 }

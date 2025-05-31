@@ -15,10 +15,10 @@ class OtpModels extends Model
     protected $primaryKey = 'otp_id'; 
     public $timestamps = true; 
     protected $fillable = [
-        'tenant_id',
         'email',
         'otpCode',
         'otpExpires_at',
+        'role'
 
     ];
         protected $dates = ['otpExpires_at', 'deleted_at'];

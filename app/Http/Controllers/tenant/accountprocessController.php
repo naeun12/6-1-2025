@@ -120,11 +120,14 @@ class accountprocessController extends Controller
 {
     // Validate the request
     $validated = $request->validate([
+       
+
         'email' => 'required|email|unique:tenants,email',
         'phonenumber' => 'required|string|unique:tenants,phonenumber|regex:/^\+?[0-9]{10,15}$/|max:11|min:11',
         'postalcode' => 'required|string|max:4|regex:/^[a-zA-Z0-9\s\-]+$/',
         'password' => 'required|string|min:8|confirmed',
     ], [
+        
          'email.required' => 'The email field is required.',
         'email.email' => 'Please enter a valid email address.',
         'email.unique' => 'This email is already registered.',
@@ -142,6 +145,7 @@ class accountprocessController extends Controller
         'password.required' => 'The password field is required.',
         'password.min' => 'The password must be at least 8 characters.',
         'password.confirmed' => 'The password confirmation does not match.',
+        
 
     ]);
 
