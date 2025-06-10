@@ -1,17 +1,8 @@
 <template>
+    <Loader ref="loader" />
+    <Toastcomponents ref="toast" />
 
     <form @submit.prevent="nextStep">
-        <div v-if="LoaderSendingEmail" class="loader-overlay animated-fade">
-            <div class="d-flex flex-column align-items-center justify-content-center h-100">
-                <!-- Bootstrap spinner -->
-                <div class="spinner-border text-primary mb-3" role="status" style="width: 4rem; height: 4rem;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-
-                <p class="mt-3 text-muted animated-text">Loading, {{ emailMessage }}</p>
-            </div>
-        </div>
-
         <!-- Steps Navigation -->
         <div class="nav-pills w-100 bg-info">
             <ul class="nav mb-3 justify-content-center flex-wrap">
@@ -23,9 +14,6 @@
                 </li>
             </ul>
         </div>
-
-
-
         <!-- Step Content -->
         <div class="tab-content">
             <!-- Step 1: Information -->
@@ -134,81 +122,64 @@
                 </div>
 
             </div>
-            <div class=" modal-overlay py-5 mt-5 " v-if="PersonalDetailsModal">
-                <div class=" modal-container ">
-
-                    <div class=" confirmation-box mb-5">
-                        <h2 class="mb-5 mt-3"></h2>
-
-                        <svg class="checkmark mb-5" viewBox="0 0 52 52">
-                            <circle class="checkmark-circle" fill="none" stroke="#e74c3c" stroke-width="5" cx="26"
-                                cy="26" r="24" />
-                            <path class="checkmark-check" fill="none" stroke="#e74c3c" stroke-width="5"
-                                d="M16 16l20 20 M16 36l20 -20" />
-                        </svg>
-                        <h3 class="mb-5">{{ this.errorMessage }}</h3>
-                        <button class="btn w-50" @click="PersonalDetailsErrorsModal">OK</button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Step 2: Government ID -->
+            <!-- Step 1: Upload Government ID -->
             <div v-if="currentStep === 1">
                 <h2 class="text-center mb-2 text-create">Upload Government ID</h2>
-                <div class="d-flex justify-content-center mb-0">
-                    <div class="file-upload">
-                        <div class="image-upload-wrap" @click="triggerGovIdInput">
-                            <input ref="govIdInput" class="file-upload-input" type="file" accept="image/*"
-                                @change="handleGovermentIdUpload" />
-                            <div class="drag-text">
-                                <h3>Drag and drop a Government ID</h3>
-                            </div>
-                        </div>
 
-                        <!-- Image Preview Container -->
-                        <div class="file-upload-content" v-if="govermentIdPicPreview">
-                            <img class="file-upload-image" :src="govermentIdPicPreview" alt="Uploaded ID">
+                <!-- Upload Box -->
+                <div class="border border-secondary rounded-3 p-4 mb-3 text-center" style="cursor: pointer;"
+                    @click="triggerGovIdInput">
+                    <input ref="govIdInput" class="d-none" type="file" accept="image/*"
+                        @change="handleGovermentIdUpload" />
 
-                            <div class="image-title-wrap">
-                                <button type="button" @click="removeGovermentPermitPic" class="remove-image">
-                                    Remove <span class="image-title">Uploaded Image</span>
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Icon + Text -->
+                    <div class="d-flex flex-column align-items-center text-center mb-3">
+                        <h5 class="text-secondary mt-2">Upload Government ID</h5>
+                        <small class="text-muted">Click to browse and select an image file</small>
                     </div>
-
                 </div>
 
+                <!-- Image Preview -->
+                <div v-if="govermentIdPicPreview" class="text-center mb-3">
+                    <img :src="govermentIdPicPreview" alt="Uploaded ID" class="img-fluid rounded mb-2"
+                        style="max-height: 250px;" />
+                    <div>
+                        <button type="button" @click="removeGovermentPermitPic" class="btn btn-sm">
+                            Remove Uploaded Image
+                        </button>
+                    </div>
+                </div>
             </div>
+
 
             <!-- Step 3: Business Permit -->
             <div v-if="currentStep === 2">
-                <h2 class="text-center mb-0  text-create">Upload Business Permit</h2>
-                <div class="d-flex justify-content-center mb-0">
-                    <div class="file-upload">
-                        <div class="image-upload-wrap" @click="triggerBusinessPermitInput">
-                            <input ref="businessPermitInput" class="file-upload-input" type="file" accept="image/*"
-                                @change="handleBusinessPermitUpload" />
-                            <div class="drag-text">
-                                <h3>Drag and drop a Business Permit</h3>
-                            </div>
-                        </div>
+                <h2 class="text-center mb-2 text-create">Upload Business Permit</h2>
 
-                        <!-- Image Preview Container -->
-                        <div class="file-upload-content" v-if="businessIdPicPreview">
-                            <img class="file-upload-image" :src="businessIdPicPreview" alt="Uploaded ID">
+                <!-- Upload Box -->
+                <div class="border border-secondary rounded-3 p-4 mb-3 text-center" style="cursor: pointer;"
+                    @click="triggerBusinessPermitInput">
+                    <input ref="businessPermitInput" class="d-none" type="file" accept="image/*"
+                        @change="handleBusinessPermitUpload" />
 
-                            <div class="image-title-wrap">
-                                <button type="button" @click="removeBusinessPermitPic" class="remove-image">
-                                    Remove <span class="image-title">Uploaded Image</span>
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Icon + Text -->
+                    <div class="d-flex flex-column align-items-center text-center mb-3">
+                        <h5 class="text-secondary mt-2">Upload Business Permit</h5>
+                        <small class="text-muted">Click to browse and select an image file</small>
                     </div>
                 </div>
 
-
-
+                <!-- Image Preview -->
+                <div v-if="businessIdPicPreview" class="text-center mb-3">
+                    <img :src="businessIdPicPreview" alt="Uploaded ID" class="img-fluid rounded mb-2"
+                        style="max-height: 250px;" />
+                    <div>
+                        <button type="button" @click="removeBusinessPermitPic" class="btn btn-sm">
+                            Remove Uploaded Image
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Step 4: OTP -->
@@ -218,13 +189,14 @@
                     <h2 class="mb-4 text-create">OTP Verification</h2>
                     <p class="mb-4">Please enter the verification OTP sent to your email.</p>
                     <!-- OTP Inputs -->
-                    <div class="otp-inputs d-flex justify-content-center gap-2 mb-5 ">
+                    <div class="otp-inputs d-flex justify-content-center gap-2 mb-5">
                         <input v-for="(digit, index) in otpdigits" :key="index" type="text" :ref="'otpInput' + index"
                             maxlength="1" class="form-control text-center fs-4" name="codeotp"
-                            v-model="otpdigits[index]" @input="handleInput(index)"
-                            @keydown.backspace="handleBackspace(index)" required
+                            v-model="otpdigits[index]" @input="handleInput(index, $event)"
+                            @keydown.backspace="handleBackspace(index, $event)"
                             style="width: 50px; height: 50px; border: 2px solid #4edce2;" />
                     </div>
+
 
                     <!-- OTP Timer -->
                     <div class=" otp_timer mb-4">
@@ -254,25 +226,21 @@
                 Next
             </button>
         </div>
-    </form>
-    <!-- Already have an account? Link -->
 
-    <div :class="['container-toast mt-5', { show: toaster }]" v-show="toaster">
-        <!-- Toast Container -->
-        <div :class="['toast-child', `bg-${toastColor}`]">
-            <div class="toast-body d-flex justify-content-between align-items-center text-white fw-bold py-3 px-4">
-                <span class="text-wrap">{{ this.Message }}</span>
-                <button type="button" class="btn-close btn-close-white ms-3" @click="ExitToaster"
-                    aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
+    </form>
+
 </template>
 <script>
-import { data } from '@maptiler/sdk';
+import Loader from '@/components/loader.vue';
 import axios from 'axios';
+import Toastcomponents from '@/components/Toastcomponents.vue';
 
 export default {
+    components: {
+        Toastcomponents,
+        Loader
+
+    },
 
     name: 'LandlordRegister',
     data() {
@@ -282,13 +250,6 @@ export default {
             govermentIdPicPreview: "",
             businessIdPicPreview: "",
             //messages, modals and toaster
-            successMessage: "",
-            errorMessage: "",
-            Message: "",
-            RegisterModal: false,
-            PersonalDetailsModal: false,
-            toaster: false,
-            toastColor: "",
             errors: {},
             //steps
             steps: ["Personal Details", "Identity Verification", "Business Documentation", "Email Verification"],
@@ -305,15 +266,27 @@ export default {
             governmentIdFile: "",
             businessPermitFile: "",
             //loader and otp
-            LoaderSendingEmail: false,
-            emailMessage: "",
             otpTimer: 0,
             otpdigits: Array(6).fill(''),
+
 
         };
     },
     //timer
     methods: {
+        showToast(message, color = 'success') {
+            this.messageToaster = message;
+            this.toastColor = color;
+            this.toaster = true;
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                this.ExitToaster();
+            }, 3000);
+        },
+        ExitToaster() {
+            this.toaster = false;
+        },
         formattedTime() {
 
             const minutes = Math.floor(this.otpTimer / 60);
@@ -336,8 +309,6 @@ export default {
                     isValid = this.IdentityVerification();
                 }
                 else if (this.currentStep === 2) {
-                    this.LoaderSendingEmail = true;
-                    this.emailMessage = "Sending Email";
                     isValid = this.BusinessDocumentation();
                 }
 
@@ -433,21 +404,11 @@ export default {
             }
         },
         //validations 
-        PersonalDetailsValidation() {
-            this.errors = {};
-            // Validate each field
-            if (!this.firstname) this.errors.firstname = ["Firstname is required."];
-            if (!this.lastname) this.errors.lastname = ["Lastname is required."];
-            if (!this.email) this.errors.email = ["Email is required."];
-            if (!this.password) this.errors.password = ["Password is required."];
-            if (!this.phonenumber) this.errors.phonenumber = ["Phone Number is required."];
-            if (!this.gender) this.errors.gender = ["Gender is required."];
-            if (!this.profilePic) this.errors.profilePic = ["Profile Picture is required."];
-            return Object.keys(this.errors).length === 0;
-        },
         //Input Data
         //personal Details
         async PersonalDetails() {
+            this.$refs.loader.loading = true;
+
             const formData = new FormData();
             formData.append('firstname', this.firstname.trim());
             formData.append('lastname', this.lastname.trim());
@@ -456,40 +417,29 @@ export default {
             formData.append('password', this.password.trim());
             formData.append('password_confirmation', this.password_confirmation.trim());
             formData.append("profilePic", this.profilePic);
+            formData.append("gender", this.gender);
             try {
-                if (this.PersonalDetailsValidation()) {
-                    const response = await axios.post('/personalDetails', formData, {
-                        headers: {
-                            // DON'T set Content-Type when using FormData
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    });
-
-                    if (response.data.status === 'success') {
-                        this.currentStep = 1;
-                        return true;
+                const response = await axios.post('/personalDetails', formData, {
+                    headers: {
+                        // DON'T set Content-Type when using FormData
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                    else {
-                        this.PersonalDetailsModal = true;
-                        this.errorMessage = "Oops! It looks like you missed some fields. Please fill out everything we need.";
-                    }
+                });
 
+                if (response.data.status === 'success') {
+                    this.currentStep = 1;
+                    this.$refs.loader.loading = false;
+                    this.errors = {};
 
-                }
-                else {
-                    this.PersonalDetailsModal = true;
-                    this.errorMessage = "Oops! It looks like you missed some fields. Please fill out everything we need.";
+                    return true;
                 }
             } catch (error) {
+                this.$refs.loader.loading = false;
                 console.clear();
                 if (error.response) {
                     if (error.response.status === 422) {
-                        this.PersonalDetailsModal = true;
-                        this.errorMessage = "Oops! Something doesn't look right. Please double-check your entries.";
                         this.errors = error.response.data.errors || {};
                     } else {
-
-                        this.PersonalDetailsModal = true;
                         this.errorMessage = error.response.data;
                     }
                 }
@@ -497,6 +447,8 @@ export default {
         },
         //Identify Verifaction
         async IdentityVerification() {
+            this.$refs.loader.loading = true;
+
             const formData = new FormData();
 
             formData.append('governmentIdPic', this.governmentIdFile);
@@ -508,17 +460,20 @@ export default {
                 });
                 if (response.data.status === "success") {
                     this.currentStep = 2;
+                    this.$refs.loader.loading = false;
 
                     return true;
                 }
             }
             catch (error) {
                 if (error.response) {
+                    this.$refs.loader.loading = false;
+
                     if (error.response.status === 422) {
-                        console.log('Validation errors:', error.response.data.errors);
-                        this.PersonalDetailsModal = true;
-                        this.errorMessage = "Oops! Something doesn't look right. Please double-check your entries.";
-                        this.errors = error.response.data.errors || {};
+                        const errorMessages = Object.values(error.response.data.errors).flat().join('\n');
+                        console.log('Validation errors:', errorMessages);
+                        this.$refs.toast.showToast(errorMessages, 'danger');
+
                     } else {
                         console.error('Registration error:', error.response.data);
                     }
@@ -531,6 +486,8 @@ export default {
 
         //Business Documentation
         async BusinessDocumentation() {
+            this.$refs.loader.loading = true;
+
             const formData = new FormData();
             formData.append('businessPermitPic', this.businessPermitFile);
             formData.append('email', this.email);
@@ -542,40 +499,42 @@ export default {
                     }
                 });
                 if (response.data.status === "success") {
-                    this.toaster = true;
-                    this.Message = response.data.message;
-                    this.toastColor = "success";
+                    const message = Object.values(response.data.message).flat().join('\n');
+                    this.$refs.toast.showToast(message, 'success');
                     this.startOtpTimer(response.data.timer);
-
                     this.currentStep = 3;
+                    this.$refs.loader.loading = false;
                     return true;
-                }
-                else if (response.data.status === "error") {
-                    this.toaster = true;
-                    this.Message = response.data.message;
-                    this.toastColor = "danger";
                 }
             }
             catch (error) {
+                this.$refs.loader.loading = false;
+
                 if (error.response) {
+
                     if (error.response.status === 422) {
-                        this.PersonalDetailsModal = true;
-                        this.errorMessage = "Oops! Something doesn't look right. Please double-check your entries.";
-                        this.errors = error.response.data.errors || {};
+
+                        const message = Object.values(error.response.data.message).flat().join('\n');
+                        this.$refs.toast.showToast(message, 'danger');
+
                     } else {
-                        console.error('Registration error:', error.response.data);
+                        const message = Object.values(error.response.data.message).flat().join('\n');
+                        this.$refs.toast.showToast(message, 'danger');
                     }
                 } else {
-                    console.error('Network error:', error.message);
+                    const message = Object.values(error.response.data.message).flat().join('\n');
+                    this.$refs.toast.showToast(message, 'danger');
                 }
             }
             finally {
-                this.LoaderSendingEmail = false;
+                this.$refs.loader.loading = false;
             }
             return false;
         },
         //Register Landlord
         async RegisterLandlord() {
+            this.$refs.loader.loading = true;
+
             const formData = new FormData();
             formData.append('firstname', this.firstname.trim());
             formData.append('lastname', this.lastname.trim());
@@ -596,11 +555,12 @@ export default {
                     }
                 });
                 if (response.data.status === "success") {
-                    this.toaster = true;
-                    this.Message = response.data.message;
-                    this.toastColor = "success";
+                    const message = Object.values(response.data.message).flat().join('\n');
+                    this.$refs.toast.showToast(message, 'success');
+                    this.$refs.loader.loading = false;
                     this.Emptyfill();
                     this.currentStep = 0;
+                    this.errors = {};
                     return true;
                 }
             }
@@ -608,31 +568,22 @@ export default {
                 if (error.response) {
                     const response = error.response;
                     if (response.data.status === "error") {
-                        this.toaster = true;
-                        this.Message = response.data.message;
-                        this.toastColor = "danger";
+                        const message = Object.values(response.data.message).flat().join('\n');
+                        this.$refs.toast.showToast(message, 'success');
+                        this.$refs.loader.loading = false;
+
                     }
                 } else {
-                    this.toaster = true;
-                    this.Message = response.data.message;
-                    this.toastColor = "danger";
+                    const message = Object.values(response.data.message).flat().join('\n');
+                    this.$refs.toast.showToast(message, 'success');
+                    this.$refs.loader.loading = false;
+
                 }
             }
             return false;
 
         },
-        //modal and Toast
-        //Toaster
-        ExitToaster() {
-            this.toastColor = "";
-            this.toaster = false;
-            this.Message = "";
-        },
 
-        //Personal Details Modal
-        PersonalDetailsErrorsModal() {
-            this.PersonalDetailsModal = false;
-        },
         //Timer and OTP
         startOtpTimer(timerValue) {
             const expirationTime = new Date(timerValue);
@@ -677,14 +628,56 @@ export default {
         beforeUnmount() {
             this.stopTimer();
         },
-        handleInput(index) {
-            const currentInput = this.otpdigits[index];
-            if (currentInput.length === 1 && index < 5) {
+        handleInput(index, event) {
+            const value = event.target.value;
+
+            // Only allow digits (0-9)
+            if (!/^\d$/.test(value)) {
+                this.otpdigits[index] = '';
+                return;
+            }
+
+            this.otpdigits[index] = value;
+
+            // Move focus to next input if not last
+            if (index < this.otpdigits.length - 1) {
+                const nextInput = this.$refs[`otpInput${index + 1}`];
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        },
+
+        handleOtpInput(index) {
+            const currentValue = this.otpdigits[index];
+
+            // If one digit is typed, move to the next input
+            if (currentValue.length === 1 && index < this.otpdigits.length - 1) {
                 this.$refs[`otpInput${index + 1}`]?.focus();
             }
         },
+
+        handleBackspace(index, event) {
+            if (event.key === 'Backspace' && this.otpdigits[index] === '' && index > 0) {
+                const prevInput = this.$refs[`otpInput${index - 1}`];
+                if (prevInput) {
+                    prevInput.focus();
+                }
+            }
+        },
+
         getOtpCode() {
             return this.otpDigits.join('');
+        },
+        handlePaste(event) {
+            const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+            for (let i = 0; i < pasted.length; i++) {
+                this.otpdigits[i] = pasted[i];
+            }
+            this.$nextTick(() => {
+                const nextIndex = pasted.length >= 6 ? 5 : pasted.length;
+                this.$refs[`otpInput${nextIndex}`]?.focus();
+            });
         },
 
         async resendOtp() {
@@ -750,7 +743,6 @@ export default {
             this.governmentIdFile = "";
             this.businessIdPicPreview = "";
             this.businessPermitFile = "";
-            // this.BusinessPermitPic = "";
             this.otpTimer = 0;
             this.otpdigits = Array(6).fill('');
 
@@ -772,6 +764,14 @@ export default {
             return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         },
     },
+    mounted() {
+        this.$nextTick(() => {
+            if (this.currentStep === 3) {
+                this.$refs.otpInput0?.focus();
+            }
+        });
+    }
+
 
 
 };

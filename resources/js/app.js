@@ -3,7 +3,7 @@ import { createApp } from 'vue'; // Vue 3
 import TenantRegister from './components/tenants/tenantRegister.vue';
 import LandlordRegister from './components/landlord/landlordregister.vue';
 import LandlordLogin from './components/landlord/landlordlogin.vue';
-import landlorddormManagement from './components/landlord/auth/dormManagement.vue';
+import LandlordDormManagement from './components/landlord/auth/DormManagement.vue';
 import landlordroomManagement from './components/landlord/auth/roomManagement.vue';
 import tenantAuth from './components/landlord/auth/tenant.vue';
 import tenantScreening from './components/landlord/auth/tenantScreening.vue';
@@ -12,6 +12,9 @@ import Analytics from './components/landlord/auth/analytics.vue';
 import MessagingCenter from './components/landlord/auth/messagingCenter.vue';
 import ReviewandFeedback from './components/landlord/auth/ReviewandFeedback.vue';
 import Notification from './components/landlord/auth/Notification.vue';
+import homepage from './components/tenants/auth/homepage.vue';
+import tenant from './components/tenants/tenantLogin.vue';
+import RoomDetails from './components/tenants/auth/roomdetails.vue';
 
 import AOS from 'aos';
 import 'aos/dist/aos.css'
@@ -33,7 +36,7 @@ if (landlordContainerLogin) {
 }
 const landlorddormManagementContainer = document.querySelector('#landlorddormManagement');
 if (landlorddormManagementContainer) {
-    createApp(landlorddormManagement).mount('#landlorddormManagement');
+    createApp(LandlordDormManagement).mount('#landlorddormManagement');
 
 }
 const landlordroomManagementContainer = document.querySelector('#landlordroomManagement');
@@ -75,6 +78,21 @@ if (NotificationController) {
     createApp(Notification).mount('#Notification');
 
 }
+const homepageController = document.querySelector('#homepage');
 
+if (homepageController) {
+    createApp(homepage).mount('#homepage');
+}
+const tenantController = document.querySelector('#tenant');
+
+if (tenantController) {
+    createApp(tenant).mount('#tenant');
+}
+const RoomDetailsController = document.querySelector('#RoomDetails');
+
+if (RoomDetailsController) {
+    createApp(RoomDetails).mount('#RoomDetails');
+
+}
 
 

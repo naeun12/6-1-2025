@@ -229,6 +229,58 @@ public function resendOtp(Request $request)
    
 }
 }
+public function loginTenant(Request $request)
+{
+    try
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required' => 'Please enter email address',
+            'email.email' => 'Please enter a valid email address',
+            'password.required' => 'Please enter your password',
+        ]);
+    
+        $user = tenantaccountModel::where('email', $request->email)->first();
+    
+        if (!$user || !\Hash::check($request->password, $user->password_hash)) {
+            return response()->json(['message' => 'Invalid credentials.'], 401);
+        }
+    
+    session([
+        'tenant_logged_in' => true,
+        'tenant_id' => $user->tenant_id,
+        'tenant_firstname' => $user->firstname,
+        'tenant_lastname' => $user->lastname,
+        'profile_pic_url' => $user->profile_pic_url
+    ]);
+    
+        return response()->json([
+            'message' => 'Login successful',
+            'status' => 'success',
+            'tenant' => [
+                'id' => $user->tenant_id,
+                'firstname' =>$user->firstname,
+                'lastname' =>$user->lastname,
+            ],
+    
+        ]);
+    }
+    catch(\Illuminate\Validation\ValidationException $e)
+    {
+
+    }
+   
+}
+public function logout(Request $request)
+{
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/tenantLogin');
+}
+
 
     
 

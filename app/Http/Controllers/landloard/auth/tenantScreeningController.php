@@ -10,5 +10,6 @@ class tenantScreeningController extends Controller
     public function tenantScreening()
     {
         return view('landlord.auth.tenantScreening',["title" => "Landlord - Tenants", 'headerName' => 'Tenants Screening']);
+        
     }
 }

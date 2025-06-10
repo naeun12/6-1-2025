@@ -2,6 +2,17 @@
 
 
     <div>
+        <loader ref="loader" />
+        <div :class="['container-toast mt-5', { show: toaster }]">
+            <!-- Toast Container -->
+            <div :class="['toast-child', `bg-${toastColor}`]">
+                <div class="toast-body d-flex justify-content-between align-items-center text-white fw-bold py-3 px-4">
+                    <span class="text-wrap">{{ messageToaster }}</span>
+                    <button type="button" class="btn-close btn-close-white ms-3" @click="ExitToaster"
+                        aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
 
         <form @submit.prevent="submitTenant">
 
@@ -154,97 +165,56 @@
 
 
 
-            <div v-if="modalVisible" class="modal-backdrop" @click="closeModal"></div>
 
-            <div v-if="modalVisible" class="custom-modal">
-                <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h5 class="modal-title text-center">Email OTP</h5>
-                        <button type="button" class="btn-close" @click="closeModal">×</button>
-                    </div>
 
-                    <!-- Modal Body -->
-                    <div class="modal-body">
-                        <p>Please enter the verification OTP sent to your email.</p>
-                        <div class="otp-inputs">
-                            <input v-for="(digit, index) in otpdigits" :key="index" type="text"
-                                :ref="'otpInput' + index" maxlength="1" class="form-control" name="codeotp"
-                                v-model="otpdigits[index]" @input="handleInput(index)"
-                                @keydown.backspace="handleBackspace(index)" required />
-                        </div>
-                        <div class="otp_timer mb-3">
-                            <p class="primary" v-if="otpTimer > 0">OTP expires in: {{ formattedTime }}</p>
-                        </div>
-                        <div class="modal-actions">
-                            <button type="submit" class="btn btn-primary">Verify Email</button>
-                            <button type="button" @click="resendOtp" class="btn btn-success">Resend OTP</button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </form>
     </div>
-    <div :class="['container-toast', { show: toastgmailvisible }]" v-show="toastgmailvisible">
-        <!-- Toast Container -->
-        <div :class="['toast-child', `bg-${toastColor}`]">
-            <div class="toast-body d-flex justify-content-between align-items-center text-white fw-bold py-3 px-4">
-                <span class="text-wrap">{{ this.toastResponseText }}</span>
-                <button type="button" class="btn-close btn-close-white ms-3" @click="ExittoastGmail"
-                    aria-label="Close"></button>
+    <div v-if="modalVisible" class="custom-modal">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title text-center">Email OTP</h5>
+                <button type="button" class="btn-close" @click="closeModal">×</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <p>Please enter the verification OTP sent to your email.</p>
+                <div class="otp-inputs">
+                    <input v-for="(digit, index) in otpdigits" :key="index" type="text" :ref="'otpInput' + index"
+                        maxlength="1" class="form-control" name="codeotp" v-model="otpdigits[index]"
+                        @input="handleInput(index)" @keydown.backspace="handleBackspace(index)" required />
+                </div>
+                <div class="otp_timer mb-3">
+                    <p class="primary" v-if="otpTimer > 0">OTP expires in: {{ formattedTime }}</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary" @click="submitTenant">Verify Email</button>
+                    <button type="button" @click="resendOtp" class="btn btn-success">Resend OTP</button>
+                </div>
             </div>
         </div>
+
     </div>
+
     <!--Register Error Modal-->
-    <div v-if="RegisterErrorOpenModal" class="modal-overlay ">
-        <div class="modal-container ">
 
-            <div class="confirmation-box mb-5">
-                <h2 class="mb-5 mt-3">{{ this.RegisterErrorMessage }}</h2>
-
-                <svg class="checkmark mb-5" viewBox="0 0 52 52">
-                    <circle class="checkmark-circle" fill="none" stroke="#e74c3c" stroke-width="5" cx="26" cy="26"
-                        r="24" />
-                    <path class="checkmark-check" fill="none" stroke="#e74c3c" stroke-width="5"
-                        d="M16 16l20 20 M16 36l20 -20" />
-                </svg>
-                <h3 class="mb-5">{{ this.RegisterErrorChildMessage }}</h3>
-                <button class="btn btn-danger w-50" @click="RegisterErrorCloseModal">OK</button>
-            </div>
-        </div>
-    </div>
     <!--Register Success Modal-->
 
-    <div v-if="showSuccessModal" class="modal-overlay ">
-        <div class="modal-container ">
-
-            <div class="confirmation-box mb-5">
-                <h2 class="mb-5 mt-4">Welcome to DormHub</h2>
-                <svg class="checkmark mb-5" viewBox="0 0 52 52">
-                    <circle class="checkmark-circle" fill="none" stroke="#2ecc71" stroke-width="5" cx="26" cy="26"
-                        r="24" />
-                    <path class="checkmark-check" fill="none" stroke="#2ecc71" stroke-width="5" d="M14 27l7 7 16-16" />
-                </svg>
-                <h3 class="mb-5"> {{ this.successMessage }}</h3>
-                <button class="btn btn-success w-50" @click="RegistercloseModal">OK</button>
-            </div>
-
-        </div>
-    </div>
 
 
-    <div v-if="isLoading" class="loader-overlay">
-        <div class="d-flex flex-column align-items-center justify-content-center h-100">
-            <img :src="'/images/MoreImages/sendingEmail.gif'" alt="Sending Email" class="email-gif mb-3 w-25">
-            <p class="mt-3 text-muted animated-text">Sending email, please wait...</p>
-        </div>
-    </div>
+
 </template>
 <script>
 import axios from 'axios';
-
+import loader from '@/components/loader.vue';
+import Toastcomponents from '@/components/Toastcomponents.vue';
 export default {
+    components: {
+        loader,
+        Toastcomponents,
+
+    },
     name: "TenantRegistration",
     data() {
         return {
@@ -268,13 +238,9 @@ export default {
             selectedProvince: "",
             selectedCity: "",
             cities: [],
-            showSuccessModal: false,
-            successMessage: "",
-            RegisterErrorOpenModal: false,
-            RegisterErrorMessage: "",
-            toastgmailvisible: false,
-            toastResponseText: "",
-            toastColor: "",
+            toaster: false,
+            toastColor: 'success', // Default color
+            messageToaster: '',
             RegisterErrorChildMessage: "",
             otpdigits: Array(6).fill(''),
             provinces: [],
@@ -414,6 +380,7 @@ export default {
         this.stopTimer();
     },
 
+
     methods: {
         formattedTime() {
 
@@ -421,8 +388,19 @@ export default {
             const seconds = this.otpTimer % 60;
             return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         },
-    },
-    methods: {
+        showToast(message, color = 'success') {
+            this.messageToaster = message;
+            this.toastColor = color;
+            this.toaster = true;
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                this.ExitToaster();
+            }, 3000);
+        },
+        ExitToaster() {
+            this.toaster = false;
+        },
         updateProvinces() {
             console.log("Selected Region:", this.selectedRegion);
             this.selectedProvince = "";
@@ -484,10 +462,11 @@ export default {
             this.errors = {};
             const isFormValid = this.validateForm();
             if (isFormValid) {
-                this.isLoading = true;
+                this.$refs.loader.loading = true;
                 this.OtpVerification()
                     .then((success) => {
                         if (success) {
+                            this.showToast('OTP has been sent to your email address.', 'success');
                             this.modalVisible = true;
                             document.body.style.overflow = "hidden";
 
@@ -495,16 +474,13 @@ export default {
                     })
                     .catch((error) => {
                         console.error("Error during OTP verification:", error);
-                        alert("An error occurred while verifying OTP. Please try again.");
                     })
                     .finally(() => {
-                        this.isLoading = false; // Hide loader regardless of success or failure
+                        this.$refs.loader.loading = false;
                     });
             } else {
-                this.isLoading = false;
-                this.RegisterErrorMessage = "Incomplete Submission";
-                this.RegisterErrorChildMessage = "Please verify the information you have entered, as some required fields appear to be incomplete or empty.";
-                this.RegisterErrorOpenModal = true;
+                this.$refs.loader.loading = false;
+
 
             }
         },
@@ -531,9 +507,8 @@ export default {
                     }
                 });
                 if (response.status === 200) {
-                    this.toastgmailvisible = true;
-                    this.toastResponseText = response.data.message;
-                    this.toastColor = "success";
+                    this.showToast(response.data.message, 'success');
+
                     setTimeout(() => {
                         this.toastgmailvisible = false;
 
@@ -546,11 +521,6 @@ export default {
             catch (error) {
                 if (error.response && error.response.status === 422) {
                     console.error('Validation Errors:', error.response.data.errors);
-
-                    // Bind field-specific errors
-                    this.RegisterErrorMessage = "Invalid Submission";
-                    this.RegisterErrorChildMessage = "Please review and correct the invalid fields in the form before proceeding.";
-                    this.RegisterErrorOpenModal = true;
                     this.errors = error.response.data.errors || {};
                 } else if (error.response && error.response.status === 400) {
                     console.error('Unexpected Error:', error.response.data.message);
@@ -565,6 +535,7 @@ export default {
 
         },
         async submitTenant() {
+            this.$refs.loader.loading = true;
 
             const formData = new FormData();
             formData.append('firstname', this.firstname);
@@ -579,54 +550,46 @@ export default {
             formData.append('region', this.selectedRegion);
             formData.append('postalcode', this.postalcode);
             formData.append('currentaddress', this.currentaddress);
+
             if (this.profileFile) {
                 formData.append('profile_pic', this.profileFile);
-            }
-            else {
+            } else {
                 console.log('No Profile picture selected. Using default image');
             }
+
             formData.append('codeotp', this.otpdigits.join(''));
+
             try {
-
-
                 const response = await axios.post('/registerTenant', formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
+
                 if (response.status === 200) {
                     this.modalVisible = false;
-                    this.showSuccessModal = true;
-                    this.successMessage = response.data.message;
+                    // 
+                    this.$refs.loader.loading = false;
+                    this.showToast('Successfully Register', 'success');
                     this.errors = {};
                     this.fill();
-
-                    setTimeout(() => {
-                        this.RegistercloseModal();
-                    }, 10000);
                 }
 
+            } catch (error) {
                 if (error.response && error.response.data.errors) {
                     this.errors = error.response.data.errors;
                 }
-            }
-            catch (error) {
                 if (error.response && error.response.data.status === "error") {
-                    this.toastgmailvisible = true;
-                    this.toastResponseText = error.response.data.message;
-                    this.toastColor = "danger";
-                    setTimeout(() => {
-                        this.toastgmailvisible = false;
-                    }, 10000);
+                    this.showToast(response.data.message, 'danger');
+
                 }
-
-
+            } finally {
+                this.$refs.loader.loading = false;
             }
-
-
         },
         async resendOtp() {
+            this.$refs.loader.loading = true;
+
             try {
                 this.errors = {};
                 this.errorMessage = '';
@@ -636,12 +599,11 @@ export default {
                 }
                 const response = await axios.post('/resendOtp', requestData);
                 if (response.data.status === "success") {
-                    this.toastgmailvisible = true;
-                    this.toastResponseText = response.data.message;
-                    this.toastColor = "success";
-                    setTimeout(() => {
-                        this.toastgmailvisible = false;
-                    }, 10000);
+                    this.showToast(response.data.message, 'success');
+
+                    this.$refs.loader.loading = false;
+
+
                     this.startOtpTimer(response.data.timer);
 
 
@@ -696,20 +658,7 @@ export default {
         getOtpCode() {
             return this.otpDigits.join('');
         },
-        RegistercloseModal() {
-            this.showSuccessModal = false;
-            document.body.style.overflow = "";
 
-        },
-        RegisterErrorCloseModal() {
-            this.RegisterErrorOpenModal = false;
-            document.body.style.overflow = "";
-        },
-        ExittoastGmail() {
-            this.toastgmailvisible = false;
-
-
-        },
         startOtpTimer(timerValue) {
             const expirationTime = new Date(timerValue);
             const currentTime = new Date();
@@ -771,4 +720,41 @@ export default {
 
 
 </script>
-<style scoped></style>
+<style scoped>
+.container-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    /* near bottom */
+    right: 1.5rem;
+    /* align to right */
+    transform: none;
+    /* no horizontal centering */
+    width: 95%;
+    max-width: 30rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+@keyframes slideUpBounce {
+    0% {
+        bottom: -10rem;
+        opacity: 0;
+    }
+
+    70% {
+        bottom: 1.5rem;
+    }
+
+    100% {
+        bottom: 1.5rem;
+        opacity: 1;
+    }
+}
+
+.container-toast.show {
+    bottom: 1.5rem;
+    opacity: 1;
+    animation: slideUpBounce 0.6s ease forwards;
+}
+</style>

@@ -3,8 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\landingPageController;
 use App\Http\Middleware\AfterRegistrationMiddleware;
+use App\Http\Middleware\TenantAuth;
+
 
 use App\Http\Controllers\tenant\accountprocessController;
+use App\Http\Controllers\tenant\auth\homepageController;
+use App\Http\Controllers\tenant\auth\roomdetailsController;
+
 use App\Http\Controllers\landloard\accountprocesslandlordController;
 use App\Http\Controllers\landloard\auth\dashboard;
 use App\Http\Controllers\landloard\auth\dormManagementController;
@@ -44,6 +49,8 @@ Route::post('/verify-registration', [accountprocessController::class, 'verifyReg
 Route::match(['get', 'post'], '/SendOtp', [accountprocessController::class, 'SendOtp'])->name('SendOtp');
 Route::match(['get', 'post'], '/resendOtp', [accountprocessController::class, 'resendOtp'])->name('resendOtp');
 Route::match(['get', 'post'], '/registerTenant', [accountprocessController::class, 'registerTenant'])->name('registerTenant');
+Route::match(['get', 'post'], 'tenant-login',[accountprocessController::class,'loginTenant'])->name('tenant-login');
+
 
 //landlord login
 Route::match(['get', 'post'], '/loginLandlord', [accountprocesslandlordController::class, 'loginLandlord'])->name('loginLandlord');
@@ -62,6 +69,13 @@ Route::post('/RegisterLandlord', [accountprocesslandlordController::class, 'Regi
 Route::middleware([LandlordAuth::class])->group(function () {
     Route::match(['get', 'post'], '/landlordDashboard', [dashboard::class, 'landlordDashboard'])->name('landlordDashboard');
     Route::match(['get', 'post'], '/landlordDormManagement/{landlordId}', [dormManagementController::class, 'DormManagement'])->name('landlordDormManagement');
+    Route::match(['get', 'post'], '/input-text', [dormManagementController::class, 'inputFieldDorm'])->name('input-text');
+    Route::match(['get', 'post'], '/upload-main-image', [dormManagementController::class, 'uploadmainImage'])->name('upload-main-image');
+    Route::match(['get', 'post'], '/upload-secondary-image', [dormManagementController::class, 'uploadsecondaryImage'])->name('upload-secondary-image');
+    Route::match(['get', 'post'], '/uplad-third-image', [dormManagementController::class, 'uploadthirdImage'])->name('upload-third-image');
+    Route::match(['get', 'post'], '/edit-main-image', [dormManagementController::class, 'editmainImage'])->name('edit-main-image');
+    Route::match(['get', 'post'], '/edit-secondary-image', [dormManagementController::class, 'editsecondaryImage'])->name('edit-secondary-image');
+    Route::match(['get', 'post'], '/edit-images/{id}', [dormManagementController::class, 'imageUpdated'])->name('edit-images');
     Route::match(['get', 'post'], '/landlordRoomManagement/{landlordId}', [roomManagementController::class, 'RoomManagement'])->name('landlordRoomManagement');
     Route::match(['get', 'post'], '/tenant', [TenantController::class, 'tenant'])->name('tenant');
     Route::match(['get', 'post'], '/tenantScreening', [tenantScreeningController::class, 'tenantScreening'])->name('tenantScreening');
@@ -73,19 +87,41 @@ Route::middleware([LandlordAuth::class])->group(function () {
 
     //functions for landlord dorm management
     Route::post('/AddDorm', [dormManagementController::class, 'AddDorm'])->name('AddDorm');
+    // Route::post('/upload-images',[imagesDormImages::class,'dormImages'])->name('upload-images');
     Route::post('/UpdateDorm/{id}', [dormManagementController::class, 'UpdateDorm'])->name('UpdateDorm');
     Route::delete('/DeleteDorm/{id}', [dormManagementController::class, 'DeleteDorm'])->name('DeleteDorm');
     Route::get('/ListDorms', [dormManagementController::class, 'ListDorms'])->name('ListDorms');
     Route::get('/ViewDorm/{id}', [dormManagementController::class, 'ViewDorm'])->name('ViewDorm');
     Route::get('/SearchDorms', [dormManagementController::class, 'searchDorms'])->name('SearchDorms');
+     //functions for amenities
+     Route::post('/add-amenities', [dormManagementController::class, 'AddAmenities'])->name('add.amenities');
+     Route::delete('/delete-amenities/{id}', [dormManagementController::class, 'DeleteAmenities'])->name('delete.amenities');
     //functions for landlord room management
     Route::post('/addRoom', [roomManagementController::class, 'addRoom'])->name('addRoom');
-    Route::post('/UpdateRoom/{id}', [roomManagementController::class, 'UpdateRoom'])->name('UpdateRoom');
+    Route::post('/update-room/{id}', [roomManagementController::class, 'UpdateRoom'])->name('update.room');
+    Route::post('/upload-images',[imagesDormImages::class,'roomImages'])->name('upload-images');
     Route::delete('/DeleteRoom/{id}', [roomManagementController::class, 'DeleteRoom'])->name('DeleteRoom');
     Route::get('/ListRooms', [roomManagementController::class, 'ListRooms'])->name('ListRooms');
     Route::get('/ViewRoom/{id}', [roomManagementController::class, 'ViewRoom'])->name('ViewRoom');
     Route::get('/SearchRooms', [roomManagementController::class, 'searchRooms'])->name('SearchRooms');
-    //functions for amenities
-    Route::post('/add-amenities', [dormManagementController::class, 'AddAmenities'])->name('add.amenities');
-    Route::delete('/delete-amenities/{id}', [dormManagementController::class, 'DeleteAmenities'])->name('delete.amenities');
+   
 });
+//tenant auth
+//tenant account process
+Route::middleware([TenantAuth::class])->group(function () {
+    Route::get('/homepage/{tenant_id}', [homepageController::class, 'homepage'])->name('homepage');
+    Route::get('/list-dorms', [homepageController::class, 'Listdorms'])->name('list.dorms');
+    Route::get('/room-details/{dormitory_id}/{tenant_id}', [roomdetailsController::class, 'roomDetails'])->name('room.details');
+    Route::post('/tenant-information', [roomdetailsController::class, 'tenantInformation'])->name('tenant.information');
+    Route::post('/tenant-idPicture', [roomdetailsController::class, 'uploadTenantId'])->name('tenant.idPicture');
+
+    Route::get('/dorm-details', [roomdetailsController::class, 'ViewDorms'])->name('dorm.details');
+
+    Route::post('/book-room', [roomdetailsController::class, 'bookaroom'])->name('book.room');
+    Route::get('/view-room-details/{id}', [roomdetailsController::class, 'ViewRoomDetails'])->name('view.room.details');
+});
+
+
+
+
+

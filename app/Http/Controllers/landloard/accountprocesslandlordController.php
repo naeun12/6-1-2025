@@ -33,13 +33,31 @@ class accountprocesslandlordController extends Controller
     {
         try {
             $validated = $request->validate([
-                'firstname' => 'required|string|regex:/^[A-Za-z]+$/',
-                'lastname' => 'required|string|regex:/^[A-Za-z]+$/',
+               'firstname' => 'required|string|regex:/^[A-Za-z]+( [A-Za-z]+)*$/',
+                'lastname' => 'required|string|regex:/^[A-Za-z]+( [A-Za-z]+)*$/',
                 'email' => 'required|email|unique:landlords,email',
                 'phonenumber' => 'required|string|unique:landlords,phonenumber|regex:/^\+?[0-9]{10,15}$/|size:11',
                 'password' => 'required|string|min:8|confirmed',
                 'profilePic' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+                'gender' => 'required|string',
+            ], [
+                'firstname.required' => 'Please enter your first name.',
+                'lastname.required' => 'Please enter your last name.',
+                'email.required' => 'Please enter your email.',
+                'email.unique' => 'This email is already taken',
+                'phonenumber.required' => 'Please enter your phone number.',
+                'phonenumber.unique' => 'This phone number is already used',
+                'phonenumber.regex' => 'Please enter a valid 11-digit phone number.',
+                'phonenumber.size' => 'Phone number must be exactly 11 digits',
+                'password.required' => 'Please enter your password.',
+                'password.confirmed' => 'Password confirmation does not match',
+                'profilePic.required' => 'Please upload your profile picture',
+                'profilePic.image' => 'The profile picture must be an image',
+                'profilePic.mimes' => 'Allowed image types: jpg, jpeg, png',
+                'profilePic.max' => 'Image size must not exceed 2MB',
+                'gender' => 'Please enter your gender.',
             ]);
+            
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Validation passed and image uploaded successfully.'
@@ -122,15 +140,14 @@ class accountprocesslandlordController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'OTP has been sent to your Gmail. Please check your inbox to verify your account.',
+                'message' => 'OTP has been sent to your Gmail.',
                 'timer' => $expiresAt,
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $e->errors(),
+                'message' => $e->errors(),
             ], 422);
 
         } catch (\Exception $e) {
@@ -151,6 +168,7 @@ class accountprocesslandlordController extends Controller
                 'email' => 'required|email|unique:landlords,email',
                 'phonenumber' => 'required|string|unique:landlords,phonenumber|regex:/^\+?[0-9]{10,15}$/|size:11',
                 'password' => 'required|string|min:8|confirmed',
+                'gender' =>   'required|string',
                 'profilePic' => 'required|image|mimes:jpg,png,jpeg|max:2048',
                 'businessPermitPic' => 'required|image|mimes:jpg,png,jpeg|max:2048',
                 'governmentIdPic' => 'required|image|mimes:jpg,png,jpeg|max:2048',
@@ -200,10 +218,11 @@ class accountprocesslandlordController extends Controller
                 'lastname' => $validated['lastname'],
                 'email' => $validated['email'],
                 'phonenumber' => $validated['phonenumber'],
+                'gender' => $validated['gender'],
                 'password_hash' => bcrypt($validated['password']),
                 'profile_pic_url' => $profilePicPath,
-                'business_permit' => $businessPermitPath,
                 'goverment_id' => $governmentIdPath,
+                'business_permit' => $businessPermitPath,
                 ]);
                  $verifyOtp->where('email',$validated['email'])->forceDelete();
 
@@ -278,35 +297,51 @@ class accountprocesslandlordController extends Controller
 }
 public function loginLandlord(Request $request)
 {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
+    try{
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+    
+        $user = \App\Models\landlord\landlordAccountModel::where('email', $request->email)->first();
+    
+        if (!$user || !\Hash::check($request->password, $user->password_hash)) {
+            return response()->json(['message' => 'Invalid credentials.'], 401);
+        }
+    
+    session([
+        'landlord_logged_in' => true,
+        'landlord_id' => $user->landlord_id,
+        'landlord_firstname' => $user->firstname,
+        'landlord_lastname' => $user->lastname,
+        'landlord_avatar' => $user->profile_pic_url
     ]);
-
-    $user = \App\Models\landlord\landlordAccountModel::where('email', $request->email)->first();
-
-    if (!$user || !\Hash::check($request->password, $user->password_hash)) {
-        return response()->json(['message' => 'Invalid credentials.'], 401);
+    
+        return response()->json([
+            'message' => 'Login successful',
+            'status' => 'success',
+            'landlord' => [
+                'id' => $user->landlord_id,
+                'firstname' =>$user->firstname,
+                'lastname' =>$user->lastname,
+            ],
+    
+        ]);
     }
+    catch(\Illuminate\Validation\ValidationException $e)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->errors(),
+        ], 422);
 
-session([
-    'landlord_logged_in' => true,
-    'landlord_id' => $user->landlord_id,
-    'landlord_firstname' => $user->firstname,
-    'landlord_lastname' => $user->lastname,
-    'landlord_avatar' => $user->profile_pic_url
-]);
-
-    return response()->json([
-        'message' => 'Login successful',
-        'status' => 'success',
-        'landlord' => [
-            'id' => $user->landlord_id,
-            'firstname' =>$user->firstname,
-            'lastname' =>$user->lastname,
-        ],
-
-    ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+    
 }
 public function logout(Request $request)
 {

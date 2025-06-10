@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class landlordAccountModel extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;  // Add HasApiTokens here
+    protected $guard = 'landlord';
 
     protected $table = 'landlords';
     protected $primaryKey = 'landlord_id';
@@ -27,7 +28,7 @@ class landlordAccountModel extends Authenticatable
         'phonenumber',
         'gender',
         'profile_pic_url',
-        'government_id',
+        'goverment_id',
         'business_permit',
         'verify_account',
         'role',

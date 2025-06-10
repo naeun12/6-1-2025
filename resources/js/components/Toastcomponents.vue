@@ -40,37 +40,30 @@ export default {
 .container-toast {
     position: fixed;
     bottom: 1.5rem;
-    /* near bottom */
     right: 1.5rem;
-    /* align to right */
-    transform: none;
-    /* no horizontal centering */
     width: 95%;
     max-width: 30rem;
     z-index: 1000;
     opacity: 0;
-    transition: all 0.5s ease;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Slide up just a bit from the bottom-right */
 @keyframes slideUpBounce {
     0% {
-        bottom: -10rem;
+        transform: translateY(20px);
         opacity: 0;
     }
 
-    70% {
-        bottom: 1.5rem;
-    }
-
     100% {
-        bottom: 1.5rem;
+        transform: translateY(0);
         opacity: 1;
     }
 }
 
 .container-toast.show {
-    bottom: 1.5rem;
-    opacity: 1;
-    animation: slideUpBounce 0.6s ease forwards;
+    pointer-events: auto;
+    animation: slideUpBounce 0.4s ease forwards;
 }
 </style>

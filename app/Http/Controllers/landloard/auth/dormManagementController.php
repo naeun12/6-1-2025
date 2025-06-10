@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\landloard\auth;
+use Illuminate\Validation\Rule;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\landlord\landlordAccountModel;
-use App\Models\Landlord\landlordDormAnimitiesModel; // Assuming you have an Amenities model for dorm amenities
-use App\Models\landlord\landlordAmintiesModel; // Assuming you have an Amenities model for general amenities
-use App\Models\landlord\landlordDormManagement; // Assuming you have a Dorm model for dorm management
+use App\Models\Landlord\landlordDormAnimitiesModel; 
+use App\Models\landlord\landlordAmintiesModel; 
+use App\Models\landlord\landlordDormManagement; 
+use App\Models\landlord\imagesDormImages;
 
 class dormManagementController extends Controller
 {
@@ -36,11 +38,129 @@ class dormManagementController extends Controller
             'landlord' => $landlord,
         ]);
     }
-    
-    
+    public function inputFieldDorm(Request $request)
+    {
+        try
+        {
+            $validated = $request->validate([
+                'dorm_name' => 'required|string|max:255|unique:dorms,dorm_name',
+                'address' => 'required|string|max:255',
+                'description' => 'required|string',
+                'total_rooms' => 'required|integer|min:1',
+                'contact_email' => 'required|email|max:255',
+                'contact_phone' => 'required|string|max:11|min:11',
+                'rules' => 'required|string',
+                'availability' => 'required|string',
+                'occupancy_type' => 'required|string',
+                'room_features' => 'required|string',
+                'building_type' => 'required|string',
 
-   
+            ], [
+                'dorm_name.required' => 'Please enter the dormitory name.',
+                'dorm_name.unique' => 'This dormitory name is already taken.',
+                'dorm_name.max' => 'The dormitory name must not exceed 255 characters.',
+                'availability.required' => 'Please enter the Availability.',
+                'occupancy_type.required' => 'Please enter the Occupancy type name.',
+                'room_features.required' => 'Please enter the Room features.',
+                'building_type.required' => 'Please enter the Building type.',
 
+                'address.required' => 'Please enter the address.',
+                'address.max' => 'The address must not exceed 255 characters.',
+            
+                'total_rooms.required' => 'Please enter the total number of rooms.',
+                'total_rooms.integer' => 'Total rooms must be a number.',
+                'total_rooms.min' => 'There must be at least 1 room.',
+            
+                'contact_email.required' => 'Please enter a contact email.',
+                'contact_email.email' => 'Please enter a valid email address.',
+                'contact_email.max' => 'The contact email must not exceed 255 characters.',
+            
+                'contact_phone.required' => 'Please enter a contact phone number.',
+                'contact_phone.max' => 'The contact phone number must not exceed 11 characters.',
+            
+                'rules.required' => 'Please enter the dorm rules.',
+            ]);
+            
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->errors(),
+            ], 422);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function uploadmainImage(Request $request)
+    {
+        try
+        {
+            $validated = $request->validate([
+                'roomImage1File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ], [
+                'roomImage1File.required' => 'Please upload an image of the room.',
+                'roomImage1File.image' => 'The uploaded file must be an image.',
+                'roomImage1File.mimes' => 'Only jpeg, png, jpg, gif, or svg formats are allowed.',
+                'roomImage1File.max' => 'The image must not exceed 2MB in size.',
+            ]);
+            
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->errors(),
+            ], 422);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function uploadsecondaryImage(Request $request)
+    {
+        try
+        {
+            $validated = $request->validate([
+                'roomImage2File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ], [
+                'roomImage2File.required' => 'Please upload an image of the room.',
+                'roomImage2File.image' => 'The uploaded file must be an image.',
+                'roomImage2File.mimes' => 'Only jpeg, png, jpg, gif, or svg formats are allowed.',
+                'roomImage2File.max' => 'The image must not exceed 2MB in size.',
+            ]);
+            
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->errors(),
+            ], 422);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function AddDorm(Request $request)
     {
         $landlordId = session('landlord_id'); // Move inside method
@@ -62,10 +182,20 @@ class dormManagementController extends Controller
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'required|string|max:11',
             'rules' => 'nullable|string',
-        ],
-        ['contact_phone.max' => 'The contact phone number must not exceed 11 characters.',
-         'total_rooms.min' => 'The total rooms must be at least 1.',
-         'total_rooms.integer' => 'The total rooms must be an number.',]);
+            'roomImage1File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage2File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage3File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'availability' => 'required|string',
+            'occupancy_type' => 'required|string',
+            'room_features' => 'required|string',
+            'building_type' => 'required|string',
+        ],[
+            'roomImage3File.required' => 'Please upload an image of the room.',
+            'roomImage3File.image' => 'The uploaded file must be an image.',
+            'roomImage3File.mimes' => 'Only jpeg, png, jpg, gif, or svg formats are allowed.',
+            'roomImage3File.max' => 'The image must not exceed 2MB in size.',
+        ]
+    );
 
         try {
             // Generate unique dorm ID
@@ -82,20 +212,66 @@ class dormManagementController extends Controller
             $dorm->longitude = $validated['longitude'];
             $dorm->description = $validated['description'] ?? null;
             $dorm->total_rooms = $validated['total_rooms'];
-            $dorm->available_rooms = $validated['total_rooms'];
             $dorm->contact_email = $validated['contact_email'];
             $dorm->contact_phone = $validated['contact_phone'];
             $dorm->rules = $validated['rules'] ?? null;
-
+            $dorm->availability = $validated['availability'] ?? null;
+            $dorm->occupancy_type = $validated['occupancy_type'] ?? null;
+            $dorm->room_features = $validated['room_features'] ?? null;
+            $dorm->building_type = $validated['building_type'] ?? null;
             $dorm->save();
+           
+            
+                if ($request->hasFile('roomImage1File')) {
+                    $image1 = $request->file('roomImage1File');
+                    $image1Name = time() . '_1.' . $image1->getClientOriginalExtension();
+                    $image1Path = $image1->storeAs('public/uploads/roomImages', $image1Name);
+                    $mainImageUrl = asset('storage/uploads/roomImages/' . $image1Name);
+                } else {
+                    $mainImageUrl = null;
+                }
+                
+                if ($request->hasFile('roomImage2File')) {
+                    $image2 = $request->file('roomImage2File');
+                    $image2Name = time() . '_2.' . $image2->getClientOriginalExtension();
+                    $image2Path = $image2->storeAs('public/uploads/roomImages', $image2Name);
+                    $secondImageUrl = asset('storage/uploads/roomImages/' . $image2Name);
+                } else {
+                    $secondImageUrl = null;
+                }
+                
+                if ($request->hasFile('roomImage3File')) {
+                    $image3 = $request->file('roomImage3File');
+                    $image3Name = time() . '_3.' . $image3->getClientOriginalExtension();
+                    $image3Path = $image3->storeAs('public/uploads/roomImages', $image3Name);
+                    $thirdImageUrl = asset('storage/uploads/roomImages/' . $image3Name);
+                } else {
+                    $thirdImageUrl = null;
+                }       
+                    $dormImage = new imagesDormImages();
+                    $dormImage->dormitory_id = $dorm->dorm_id; 
+                    $dormImage->main_image = $mainImageUrl;
+                    $dormImage->secondary_image = $secondImageUrl;
+                    $dormImage->third_image = $thirdImageUrl;
+                    $dormImage->save();    
 
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Dorm added successfully!',
+                        'dormId' => $dorm->dorm_id,
+                    ]);  
+        
+
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Dorm added successfully!',
-                'dormId' => $dorm->dorm_id,
-            ]);
-
-        } catch (\Exception $e) {
+                'status' => 'error',
+                'message' => $e->errors(),
+            ], 422);
+    
+        }
+         catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error adding dorm.',
@@ -106,58 +282,94 @@ class dormManagementController extends Controller
 
     public function UpdateDorm(Request $request,$id)
     {
-       $validated = $request->validate([
-            'dorm_name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'description' => 'nullable|string',
-            'total_rooms' => 'required|integer|min:1',
-            'contact_email' => 'required|email|max:255',
-            'contact_phone' => 'required|string|max:11',
-            'rules' => 'nullable|string',
+        try
+        {
+            $validated = $request->validate([
+                'dorm_name' => [
+                        'required',
+                        'string',
+                        'max:255',
+                        Rule::unique('dorms')->ignore($id, 'dorm_id'),
+                    ], 
+                'address' => 'required|string|max:255',
+                'description' => 'required|string|max:1000',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'total_rooms' => 'required|integer|min:1',
+                'contact_email' => 'required|email|max:255',
+                'contact_phone' => 'required|string|min:11|max:11|regex:/^\+?[0-9]{7,11}$/',
+                'availability' => 'required|string',
+                'occupancy_type' => 'required|string',
+                'room_features' => 'required|string',
+                'building_type' => 'required|string',
+                'rules' => 'required|string|max:1000',
+            ],
+            [
+                'contact_phone.max' => 'The contact phone number must not exceed 11 characters.',
+                'contact_phone.regex' => 'The contact phone number must contain only numbers and can start with +.',
+                'total_rooms.min' => 'The total rooms must be at least 1.',
+                'total_rooms.integer' => 'The total rooms must be a number.',
+                'description.max' => 'The description must not exceed 1000 characters.',
+                'rules.max' => 'The rules must not exceed 1000 characters.',
+            ]);
             
-       ],
-       ['contact_phone.max' => 'The contact phone number must not exceed 11 characters.',
-        'total_rooms.min' => 'The total rooms must be at least 1.',
-        'total_rooms.integer' => 'The total rooms must be an number.',]
-    );
-
-        $landlordId = session('landlord_id');
-        if (!$landlordId) {
+    
+            $landlordId = session('landlord_id');
+            if (!$landlordId) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized action. Please log in as a landlord.'
+                ], 403);
+            }
+    
+            // Fetch the dorm by ID
+            $dorm = landlordDormManagement::where('dorm_id', $id)->where('landlord_id', $landlordId)->first();
+            if (!$dorm) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Dorm not found.'
+                ], 404);
+            }
+    
+            // Update dorm details
+            $dorm->dorm_name = $validated['dorm_name'];
+            $dorm->address = $validated['address'];
+            $dorm->latitude = $validated['latitude'];
+            $dorm->longitude = $validated['longitude'];
+            $dorm->description = $validated['description'] ?? null;
+            $dorm->total_rooms = $validated['total_rooms'];
+            $dorm->contact_email = $validated['contact_email'];
+            $dorm->contact_phone = $validated['contact_phone'];
+            $dorm->availability = $validated['availability'] ?? null;
+            $dorm->occupancy_type = $validated['occupancy_type'] ?? null;
+            $dorm->room_features = $validated['room_features'] ?? null;
+            $dorm->building_type = $validated['building_type'] ?? null;
+            $dorm->rules = $validated['rules'] ?? null;
+    
+            // Save changes
+            $dorm->save();
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dorm updated successfully!',
+           ]);
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized action. Please log in as a landlord.'
-            ], 403);
+                'errors' => $e->errors(),
+            ], 422);
+    
         }
-
-        // Fetch the dorm by ID
-        $dorm = landlordDormManagement::where('dorm_id', $id)->where('landlord_id', $landlordId)->first();
-        if (!$dorm) {
+         catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Dorm not found.'
-            ], 404);
+                'message' => 'Error adding dorm.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Update dorm details
-        $dorm->dorm_name = $validated['dorm_name'];
-        $dorm->address = $validated['address'];
-        $dorm->latitude = $validated['latitude'];
-        $dorm->longitude = $validated['longitude'];
-        $dorm->description = $validated['description'] ?? null;
-        $dorm->total_rooms = $validated['total_rooms'];
-        $dorm->contact_email = $validated['contact_email'];
-        $dorm->contact_phone = $validated['contact_phone'];
-        $dorm->rules = $validated['rules'] ?? null;
-
-        // Save changes
-        $dorm->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Dorm updated successfully!',
-       ]);
+        
     }
 
     public function DeleteDorm($id)
@@ -184,7 +396,7 @@ class dormManagementController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Dorm deleted successfully!'
+            'message' => 'Dorm deleted successfully!',
         ]);
     }
 
@@ -198,7 +410,7 @@ class dormManagementController extends Controller
             ], 403);
         }
         // Fetch the dorm by ID
-        $dorm = landlordDormManagement::with('amenities')
+        $dorm = landlordDormManagement::with('amenities','images')
             ->where('dorm_id', $id)
             ->where('landlord_id', $landlordId)
             ->first();
@@ -247,7 +459,7 @@ class dormManagementController extends Controller
         }
     
         $searchTerm = $request->input('search', '');
-        $dorms = LandlordDormManagement::where('landlord_id', $landlordId)
+        $dorms = LandlordDormManagement::with('images')->where('landlord_id', $landlordId)
             ->where(function ($query) use ($searchTerm) {
                 $query->where('dorm_name', 'like', '%' . $searchTerm . '%')
                     ->orWhere('address', 'like', '%' . $searchTerm . '%');
@@ -365,10 +577,176 @@ class dormManagementController extends Controller
             'message' => 'Amenity removed from dorm.'
         ]);
     }
+    public function dormImages(Request $request)
+    {
+        $request->validate([
+            'roomImage1File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage2File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage3File' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'room_id' => 'required|Integer'
+        ]);
+       // Define the folder path inside 'storage/app/public'
+       if ($request->hasFile('roomImage1File')) {
+        $image1 = $request->file('roomImage1File');
+        $image1Name = time() . '_1.' . $image1->getClientOriginalExtension();
+        $image1Path = $image1->storeAs('public/uploads/roomImages', $image1Name);
+        $mainImageUrl = asset('storage/uploads/roomImages/' . $image1Name);
+    } else {
+        $mainImageUrl = null;
+    }
     
-   
+    if ($request->hasFile('roomImage2File')) {
+        $image2 = $request->file('roomImage2File');
+        $image2Name = time() . '_2.' . $image2->getClientOriginalExtension();
+        $image2Path = $image2->storeAs('public/uploads/roomImages', $image2Name);
+        $secondImageUrl = asset('storage/uploads/roomImages/' . $image2Name);
+    } else {
+        $secondImageUrl = null;
+    }
     
+    if ($request->hasFile('roomImage3File')) {
+        $image3 = $request->file('roomImage3File');
+        $image3Name = time() . '_3.' . $image3->getClientOriginalExtension();
+        $image3Path = $image3->storeAs('public/uploads/roomImages', $image3Name);
+        $thirdImageUrl = asset('storage/uploads/roomImages/' . $image3Name);
+    } else {
+        $thirdImageUrl = null;
+    }
     
 
+    
+        $roomImage = new imagesDormImages();
+        $roomImage->dormitory_id = $request->room_id; 
+        $roomImage->main_image = $mainImageUrl;
+        $roomImage->secondary_image = $secondImageUrl;
+        $roomImage->third_image = $thirdImageUrl;
+        $roomImage->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Images uploaded successfully!',
+        ]);
+        
+    }
+    public function editmainImage(Request $request)
+{
+    try
+    {
+        // Only validate if file exists
+        if ($request->hasFile('roomImage1File')) {
+            $validated = $request->validate([
+                'roomImage1File' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ], [
+                'roomImage1File.image' => 'The uploaded file must be an image.',
+                'roomImage1File.mimes' => 'Only jpeg, png, jpg, gif, or svg formats are allowed.',
+                'roomImage1File.max' => 'The image must not exceed 2MB in size.',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success'
+        ]);
+    }
+    catch(\Illuminate\Validation\ValidationException $e)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+    public function editsecondaryImage(Request $request)
+    {
+        try
+        {
+            if ($request->hasFile('roomImage2File')) {
+                $validated = $request->validate([
+                    'roomImage2File' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                ], [
+                    'roomImage2File.image' => 'The uploaded file must be an image.',
+                    'roomImage2File.mimes' => 'Only jpeg, png, jpg, gif, or svg formats are allowed.',
+                    'roomImage2File.max' => 'The image must not exceed 2MB in size.',
+                ]);
+            }
+            return response()->json([
+               'status' => 'success'
+            ]);
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->errors(),
+            ], 422);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function imageUpdated(Request $request, $id)
+{
+    try
+    {
+        $validated = $request->validate([
+            'roomImage1File' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage2File' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'roomImage3File' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'dorm_id' => 'required|integer'
+        ]);
+    
+        $roomImage = imagesDormImages::where('images_id', $id)->where('dormitory_id', $request->dorm_id)->first();
+    
+        if (!$roomImage) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Image record not found.'
+            ], 404);
+        }
+    
+        // Only update images if uploaded
+        if ($request->hasFile('roomImage1File')) {
+            $image1Name = time() . '_1.' . $request->file('roomImage1File')->getClientOriginalExtension();
+            $request->file('roomImage1File')->storeAs('public/uploads/roomImages', $image1Name);
+            $roomImage->main_image = asset('storage/uploads/roomImages/' . $image1Name);
+        }
+    
+        if ($request->hasFile('roomImage2File')) {
+            $image2Name = time() . '_2.' . $request->file('roomImage2File')->getClientOriginalExtension();
+            $request->file('roomImage2File')->storeAs('public/uploads/roomImages', $image2Name);
+            $roomImage->secondary_image = asset('storage/uploads/roomImages/' . $image2Name);
+        }
+    
+        if ($request->hasFile('roomImage3File')) {
+            $image3Name = time() . '_3.' . $request->file('roomImage3File')->getClientOriginalExtension();
+            $request->file('roomImage3File')->storeAs('public/uploads/roomImages', $image3Name);
+            $roomImage->third_image = asset('storage/uploads/roomImages/' . $image3Name);
+        }
+    
+        $roomImage->dormitory_id = $request->dorm_id; 
+    
+        $roomImage->save();
+    
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Images updated successfully!',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Validation failed.',
+            'errors' => $e->errors()
+        ], 422);
+    }
+   
+}
 
 }

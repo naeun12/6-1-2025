@@ -1,22 +1,27 @@
 <?php
 
 namespace App\Models\tenant;
+use Laravel\Sanctum\HasApiTokens;  // Import Sanctum trait
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class tenantaccountModel extends Model
+
+class tenantaccountModel extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens,HasFactory, Notifiable;
 
-    protected $table = 'tenants'; // Define the table name
+    protected $guard = 'tenant';
 
-    protected $primaryKey = 'tenant_id'; // Correctly define the primary key
+    protected $table = 'tenants'; 
 
-    public $timestamps = true; // Enable timestamps (created_at, updated_at)
+    protected $primaryKey = 'tenant_id'; 
+    protected $keyType = 'string';
+
+    public $timestamps = true;
 
     protected $fillable = [
         'tenant_id', 
@@ -33,7 +38,15 @@ class tenantaccountModel extends Model
         'currentaddress',
         'profile_pic_url',
     ];
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
 
+    protected $hidden = [
+        'password_hash', // hide your password field properly
+        'remember_token',
+    ];
 
     // If you want to use this model for authentication
     // Make sure you extend Authenticatable instead of Model

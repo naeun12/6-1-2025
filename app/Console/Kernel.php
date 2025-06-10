@@ -31,5 +31,10 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
         
     }
+    protected $routeMiddleware = [
+        // other middleware ...
+'tenant.auth' => \App\Http\Middleware\TenantAuth::class,
+    ];
+    
   
 }

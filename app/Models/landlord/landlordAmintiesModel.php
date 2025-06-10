@@ -16,11 +16,18 @@ class landlordAmintiesModel extends Model
     ];
     public function dorms()
     {
-        return $this->belongsToMany(Dorm::class, 'dorm_amenity');
+        return $this->belongsToMany(
+            landlordDormManagement::class,
+            'amenity_dorm', // pivot table name
+            'amenity_id',   // foreign key on pivot for this model
+            'dorm_id'       // related key on pivot
+        );
     }
+    
     public function dormAmenities()
 {
     return $this->hasMany(landlordDormAnimitiesModel::class, 'amenity_id');
 }
+
     
 }

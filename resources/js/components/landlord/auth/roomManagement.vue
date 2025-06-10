@@ -1,10 +1,12 @@
 <template>
     <div class="container mt-5">
+        <Loader ref="loader" />
+        <Toastcomponents ref="toast" />
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="text-primary fw-bold">Post Room</h1>
             <div>
-                <button class="btn btn-primary" @click="VisibleAddModal = true">
+                <button class="btn btn-outline-primary" @click="VisibleAddModal = true">
                     Add Room
                 </button>
             </div>
@@ -45,10 +47,10 @@
                                 <button class="btn btn-sm btn-outline-success" @click="ViewRoom(room.room_id)">
                                     View
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" @click="VisibleUpdateModal = true">
+                                <button class="btn btn-sm btn-outline-primary" @click="editRoom(room.room_id)">
                                     Update
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" @click="VisibleDeleteModal = true">
+                                <button class="btn btn-sm btn-outline-danger" @click="deleteRoom(room.room_id)">
                                     Delete
                                 </button>
                             </div>
@@ -64,69 +66,89 @@
             style="background-color: rgba(0,0,0,0.5);">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content shadow-lg rounded-4">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header bg-outline-primary text-black">
                         <h5 class="modal-title">Add Room</h5>
-                        <button type="button" class=" btn-close" @click="VisibleAddModal = false"></button>
+                        <button type="button" class="btn-close" @click="VisibleAddModal = false"></button>
                     </div>
 
-                    <div class="modal-body">
-                        <!-- Large button groups (default and split) -->
-                        <div class="btn-group mt-5 mb-3">
-
-                            <ul class="dropdown-menu">
-
-                            </ul>
+                    <div class="modal-body px-3 px-md-4">
+                        <!-- Dorm Selector -->
+                        <div class="mb-4 d-flex align-items-center gap-2">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-lg" type="button">Dorm Name</button>
+                                <button type="button"
+                                    class="btn btn-lg btn-outline-primary dropdown-toggle dropdown-toggle-split"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li v-for="dorm in dorms" :key="dorm.dorm_id">
+                                        <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                            href="#" @click.prevent="dormId(dorm)">
+                                            <span>{{ dorm.dorm_name }}</span>
+                                            <span class="badge bg-secondary">ID: {{ dorm.dorm_id }}</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="btn-group">
-                            <button class="btn btn-primary btn-lg h-50" type="button">
-                                Dorm Name
-                            </button>
+                        <div class="border border-secondary rounded-3 p-4 mb-3 text-center" style="cursor: pointer;"
+                            @click="triggerroomImagePreview3">
+                            <input ref="RoomsImages3Input" class="d-none" type="file" accept="image/*"
+                                @change="handleroomImagePreview3" />
 
-                            <button type="button" class="btn btn-lg btn-primary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="visually-hidden">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu w-100">
-                                <li v-for="dorm in dorms" :key="dorm.dorm_id">
-                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="#"
-                                        @click.prevent="dormId(dorm)">
-                                        <span>{{ dorm.dorm_name }}</span>
-                                        <span class="badge bg-secondary">ID: {{ dorm.dorm_id }}</span>
-                                    </a>
-                                </li>
-                            </ul>
+                            <!-- Icon + Text -->
+                            <div class="d-flex flex-column align-items-center text-center mb-3">
+                                <h5 class="text-secondary mt-2">Click to Upload Room Image</h5>
+                                <small class="text-muted">Click to browse and select an image file</small>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div v-if="roomImagePreview" class="text-center mb-3">
+                            <img :src="roomImagePreview" alt="Uploaded Room Image" class="img-fluid rounded mb-2"
+                                style="max-height: 250px;" />
+                            <div>
+                                <button type="button" @click="removeroomImagePreviews3" class="btn btn-sm">
+                                    Remove Uploaded Image
+                                </button>
+                            </div>
                         </div>
                         <div class="row g-4">
                             <!-- Column 1 -->
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" readonly="ID" placeholder="Dorm ID"
+                            <div class="col-md-6">
+                                <div class="form-floating mb-2">
+                                    <input type="text" class="form-control" readonly placeholder="Dorm ID"
                                         v-model="dormsId">
-                                    <label for="ID">Dorm ID</label>
+                                    <label>Dorm ID</label>
                                 </div>
-                                <div class="form-floating mb-2 position-relative">
-                                    <input type="text" class="form-control ps-5" id="roomNumber"
-                                        placeholder="Room Number" v-model="roomNumber" maxlength="10"
-                                        pattern="[A-Za-z0-9\- ]+" title="Letters, numbers, dashes, and spaces only">
+                                <span class="text-danger small" v-if="errors.dormsId">{{ errors.dormsId[0]
+                                }}</span>
+
+                                <div class="form-floating mb-2 mt-2">
+                                    <input type="text" class="form-control" id="roomNumber" placeholder="Room Number"
+                                        v-model="roomNumber" @input="roomNumber = roomNumber.replace(/[^0-9]/g, '')" />
                                     <label for="roomNumber">Room Number</label>
-
-
                                 </div>
-                                <span class="text-danger" v-if="errors.roomNumber">{{ errors.roomNumber[0]
-                                    }}</span>
+                                <span class="text-danger small" v-if="errors.roomNumber">{{ errors.roomNumber[0]
+                                }}</span>
+
                                 <div class="form-floating mb-2 mt-2">
                                     <select class="form-select" id="roomType" v-model="roomType">
                                         <option value="" disabled selected>Select Room Type</option>
-                                        <option value="Single">Single</option>
-                                        <option value="Double">Double</option>
-                                        <option value="Studio">Studio</option>
-                                        <option value="Suite">Suite</option>
-                                        <option value="Shared">Shared</option>
+                                        <option value="Single Room">Single Room</option>
+                                        <option value="Double Room / Shared Room">Double Room / Shared Room</option>
+                                        <option value="Bedspace / Multi-Sharing Room">Bedspace / Multi-Sharing Room
+                                        </option>
+                                        <option value="Studio-Type Room">Studio-Type Room</option>
+                                        <option value="Partitioned Bedspace (Cubicle Style)">Partitioned Bedspace
+                                            (Cubicle Style)</option>
+                                        <option value="Loft Room / Mezzanine Type">Loft Room / Mezzanine Type</option>
                                     </select>
                                     <label for="roomType">Room Type</label>
                                 </div>
-                                <span class="text-danger" v-if="errors.roomType">{{ errors.roomType[0]
-                                    }}</span>
+                                <span class="text-danger small" v-if="errors.roomType">{{ errors.roomType[0]
+                                }}</span>
 
                                 <div class="form-floating mb-2 mt-2">
                                     <select class="form-select" id="availability" v-model="availability">
@@ -135,415 +157,426 @@
                                             {{ slot }}
                                         </option>
                                     </select>
-
                                     <label for="availability">Availability Status</label>
                                 </div>
-                                <span class="text-danger" v-if="errors.availability">{{ errors.availability[0]
-                                    }}</span>
+                                <span class="text-danger small" v-if="errors.availability">{{ errors.availability[0]
+                                }}</span>
+                                <div class="form-floating mb-2 mt-2">
+                                    <input type="number" class="form-control" id="areaSqm" v-model="area_sqm" min="1"
+                                        placeholder="Enter area in sqm" required>
+                                    <label for="areaSqm">Area (sqm)</label>
+                                </div>
+                                <span class="text-danger small" v-if="errors.area_sqm">{{ errors.area_sqm[0]
+                                }}</span>
 
                             </div>
 
                             <!-- Column 2 -->
-                            <div class="col-md-4">
-                                <div class="form-floating mb-2 position-relative">
-                                    <input type="number" class="form-control ps-5" id="price" placeholder="Price"
+                            <div class="col-md-6">
+                                <div class="form-floating mb-2">
+                                    <input type="number" class="form-control" id="price" placeholder="Price"
                                         v-model="price" min="0" step="0.01">
                                     <label for="price">Price (₱)</label>
-
-                                    <!-- Icon inside the input -->
-
                                 </div>
-                                <span class="text-danger" v-if="errors.availability">{{ errors.availability[0]
-                                    }}</span>
+                                <div class="form-floating mb-2 mt-2">
+                                    <select class="form-select" id="bedType" v-model="listing_type" required>
+                                        <option value="" disabled selected>Select Bed Type</option>
+                                        <option v-for="bed in filteredBeds" :key="bed" :value="bed">
+                                            {{ bed }}
+                                        </option>
+                                    </select>
+                                    <label for="bedType">Bed Type</label>
+                                </div>
 
+                                <span class="text-danger small" v-if="errors.listing_type">{{ errors.listing_type[0]
+                                }}</span>
+                                <div class="form-floating mb-2 mt-2">
+                                    <select class="form-select" id="furnishingStatus" v-model="furnishing_status"
+                                        required>
+                                        <option value="" disabled selected>Select Furnishing Status</option>
+                                        <option value="Fully Furnished">Fully Furnished</option>
+                                        <option value="Semi Furnished">Semi Furnished</option>
+                                        <option value="Unfurnished">Unfurnished</option>
+                                    </select>
+                                    <label for="furnishingStatus">Furnishing Status</label>
+                                </div>
+                                <span class="text-danger small" v-if="errors.furnishing_status">{{
+                                    errors.furnishing_status[0]
+                                }}</span>
 
                                 <div class="form-floating mb-2 mt-2">
-                                    <input type="number" min="0" max="10" class="form-control" id="capacity"
-                                        v-model="capacity" placeholder="Capacity">
+                                    <select class="form-select" id="genderPreference" v-model="gender_preference"
+                                        required>
+                                        <option value="" disabled selected>Select Gender Preference</option>
+                                        <option value="Male Only">Male Only</option>
+                                        <option value="Female Only">Female Only</option>
+                                        <option value="Any Gender">Any Gender</option>
+                                    </select>
+                                    <label for="genderPreference">Gender Preference</label>
+                                </div>
+                                <span class="text-danger small" v-if="errors.gender_preference">{{
+                                    errors.gender_preference[0]
+                                }}</span>
+
+
+                                <span class="text-danger small" v-if="errors.price">{{ errors.price[0] }}</span>
+                                <div class="mb-2 mt-2">
                                     <label for="capacity">Capacity</label>
+
                                 </div>
-                                <span class="text-danger" v-if="errors.capacity">{{ errors.capacity[0]
-                                    }}</span>
+                                <div class="d-flex align-items-center mb-2">
+
+                                    <button class="btn btn-outline-danger me-2" @click="decrementcapacity">-</button>
+                                    <div class="flex-grow-1">
+                                        <input type="text" readonly class="form-control" id="capacity"
+                                            v-model="capacity" placeholder="0">
+                                    </div>
+                                    <button class="btn btn-outline-success ms-2" @click="incrementcapacity">+</button>
+                                </div>
+
+                                <span class="text-danger small" v-if="errors.capacity">{{ errors.capacity[0]
+                                }}</span>
                             </div>
+                            <div class="d-grid gap-2 mt-4">
 
-                            <!-- Column 3 -->
-                            <div class="col-md-4">
-
-                                <!-- Optional: Image upload or preview section -->
-                                <div class="d-grid mt-4">
-                                    <button type="submit" @click="VisibleImagePostModal = true"
-                                        class="btn btn-success btn-lg">
-                                        Post Images
-                                    </button>
-                                    <button type="submit " @click="submitRoom" class="btn btn-primary btn-lg mt-3">
-                                        Submit Room
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" @click="VisibleAddModal = false">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <!--Delete Modal--->
-        <div v-if="VisibleDeleteModal" class="modal fade show d-block w-100" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);" @click.self="VisibleDeleteModal = false">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content shadow-lg border-0 rounded-4">
-                    <div class="modal-header bg-danger text-white rounded-top-4">
-                        <h5 class="modal-title fw-bold">Delete Confirmation</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="VisibleDeleteModal = false"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
-                        <p class="fs-5">Are you sure you want to delete this Room? This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-outline-secondary px-4"
-                            @click="VisibleDeleteModal = false">Cancel</button>
-                        <button type="button" class="btn btn-danger px-4" @click="confirmDelete()">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!---Update Modal-->
-        <div v-if="VisibleUpdateModal" class="modal fade show d-block w-100" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);">
-            <div class="modal-dialog modal-xl modal-dialog-centered">
-                <div class="modal-content shadow-lg rounded-4">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Update Room</h5>
-                        <button type="button" class="btn-close" @click="VisibleUpdateModal = false"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form>
-                            <div class="row g-4">
-
-                                <!-- Column 1 -->
-                                <div class="col-md-4">
-
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="roomNumber"
-                                            placeholder="Room Number">
-                                        <label for="roomNumber"></label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="roomType" placeholder="Room Type">
-                                        <label for="roomType">Room Type</label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="availability"
-                                            placeholder="Availability">
-                                        <label for="availability">Availability Status</label>
-                                    </div>
-
-                                </div>
-
-                                <!-- Column 2 -->
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="price" placeholder="Price">
-                                        <label for="price">Price</label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="amenities" placeholder="Amenities">
-                                        <label for="amenities">Amenities</label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="booking"
-                                            placeholder="Booking Status">
-                                        <label for="booking">Booking Status</label>
-                                    </div>
-                                </div>
-
-                                <!-- Column 3 -->
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="maintenance"
-                                            placeholder="Maintenance Status">
-                                        <label for="maintenance">Maintenance Status</label>
-                                    </div>
-                                    <!-- Optional: Image upload or preview section -->
-                                    <div class="d-grid mt-4">
-                                        <button type="submit" class="btn btn-success btn-lg">
-                                            Post Images
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" @click="VisibleUpdateModal = false">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- <div class="modal fade show d-block w-100" v-if="amenitiesModal" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);" @click.self="amenitiesModal = false">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header bg-primary text-white rounded-top-4">
-                        <h5 class="modal-title">Amenities</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="amenitiesModal = false"
-                            aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div v-for="(amenity, index) in amenities" :key="index" class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="amenities[index]" :id="'amenity' + index"
-                                placeholder="Enter amenity" />
-                            <label :for="'amenity' + index">Amenity {{ index + 1 }}</label>
-                        </div>
-
-                        <button class="btn btn-primary w-25 mb-4" @click="addAmenity">Add Amenities</button>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="amenitiesModal = false">Cancel</button>
-                        <button type="button" class="btn btn-primary" @click="submitAmenities">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-
-        <!--Display Data Modal-->
-        <div v-if="VisibleDisplayDataModal" class="modal fade show d-block w-100" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);" @click.self="VisibleDisplayDataModal = false">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <!-- Modal Header -->
-                    <div class="modal-header bg-primary text-white rounded-top-4">
-                        <h5 class="modal-title">Room Details</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="VisibleDisplayDataModal = false"
-                            aria-label="Close"></button>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto; padding: 1.5rem;">
-                        <div class="row g-4 ">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Room Number:</label>
-                                    <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.room_number }}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Room Type:</label>
-                                    <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.room_type }}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Price:</label>
-                                    <div class="p-2 border rounded bg-light text-break">₱{{ selectedRoom?.price }}</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Capacity:</label>
-                                    <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.capacity }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 ">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Availability:</label>
-                                    <div class="p-2 border rounded bg-light text-break">
-                                        <span class="badge"
-                                            :class="selectedRoom?.availability === 'Available' ? 'bg-success' : selectedRoom?.availability === 'Occupied' ? 'bg-danger' : 'bg-warning'">
-                                            {{ selectedRoom?.availability }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Contact Email:</label>
-                                    <div class="p-2 border rounded bg-light text-break"> {{ selectedRoom?.contact_email
-                                        }}
-
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Contact Phone:</label>
-                                    <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.contact_phone
-                                        }}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Registration Date:</label>
-                                    <div class="p-2 border rounded bg-light text-break">2023-01-01</div>
-
-                                </div>
-
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Address:</label>
-                                <div class="p-2 border rounded bg-light text-break w-100"
-                                    style="max-height: 100px;  overflow-y: auto;">
-                                    {{ selectedRoom?.address
-                                    }}
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Footer -->
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-success px-4"
-                            @click="VisibleDisplayDataModal = false">OK</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!--Images Post Modal-->
-        <div v-if="VisibleImagePostModal" class="modal fade show d-block w-100" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);">
-            <div class="modal-dialog modal-xl modal-dialog-centered">
-                <div class="modal-content shadow-lg rounded-4 overflow-hidden">
-                    <!-- Header -->
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Upload Images</h5>
-                        <button type="button" class="btn-close" @click="VisibleImagePostModal = false"></button>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="modal-body bg-white">
-                        <div class="container mx-auto">
-                            <h2 class="text-2xl font-semibold mb-4 text-center">Upload Room Images</h2>
-                            <div class="nav-pills w-100 bg-info">
-                                <ul class="nav mb-3 justify-content-center flex-wrap">
-                                    <li class="" v-for="(step, index) in steps" :key="index">
-                                        <button class="btn btn-primary m-2" :class="{ active: currentStep === index }"
-                                            :disabled="index > currentStep">
-                                            {{ step }}
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div v-if="currentStep === 0">
-                                <div class="d-flex justify-content-center mb-0">
-                                    <div class="file-upload">
-                                        <div class="image-upload-wrap" @click="triggerRoomImage1">
-                                            <input ref="RoomsImages1Input" class="file-upload-input" type="file"
-                                                accept="image/*" @change="handleroomImage1" />
-                                            <div class="drag-text">
-                                                <h3>Drag and drop a Room Images</h3>
-                                            </div>
-                                        </div>
-
-                                        <!-- Image Preview Container -->
-                                        <div class="file-upload-content" v-if="roomImage1Preview">
-                                            <img class="file-upload-image" :src="roomImage1Preview" alt="Uploaded ID">
-
-                                            <div class="image-title-wrap">
-                                                <button type="button" @click="removeRoomImages1" class="remove-image">
-                                                    Remove <span class="image-title">Uploaded
-                                                        Image</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-if="currentStep === 1">
-                                <div class="d-flex justify-content-center mb-0">
-                                    <div class="file-upload">
-                                        <div class="image-upload-wrap" @click="triggerRoomImage2">
-                                            <input ref="RoomsImages2Input" class="file-upload-input" type="file"
-                                                accept="image/*" @change="handleroomImage2" />
-                                            <div class="drag-text">
-                                                <h3>Drag and drop a Room Images</h3>
-                                            </div>
-                                        </div>
-
-                                        <!-- Image Preview Container -->
-                                        <div class="file-upload-content" v-if="roomImage2Preview">
-                                            <img class="file-upload-image" :src="roomImage2Preview" alt="Uploaded ID">
-
-                                            <div class="image-title-wrap">
-                                                <button type="button" @click="removeRoomImages2" class="remove-image">
-                                                    Remove <span class="image-title">Uploaded
-                                                        Image</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-if="currentStep === 2">
-                                <div class="d-flex justify-content-center mb-0">
-                                    <div class="file-upload">
-                                        <div class="image-upload-wrap" @click="triggerRoomImage3">
-                                            <input ref="RoomsImages3Input" class="file-upload-input" type="file"
-                                                accept="image/*" @change="handleroomImage3" />
-                                            <div class="drag-text">
-                                                <h3>Drag and drop a Room Images</h3>
-                                            </div>
-                                        </div>
-
-                                        <!-- Image Preview Container -->
-                                        <div class="file-upload-content" v-if="roomImage3Preview">
-                                            <img class="file-upload-image" :src="roomImage3Preview" alt="Uploaded ID">
-
-                                            <div class="image-title-wrap">
-                                                <button type="button" @click="removeRoomImages3" class="remove-image">
-                                                    Remove <span class="image-title">Uploaded
-                                                        Image</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between mt-4  text-create">
-                                <button type="button" class="btn btn-secondary" @click="prevStep"
-                                    :disabled="currentStep === 0">
-                                    Previous
-                                </button>
-                                <button type="button" class="btn btn-primary" @click="nextStep"
-                                    :disabled="currentStep === steps.length - 1">
-                                    Next
+                                <button type="submit" @click="submitRoom" class="btn btn-outline-primary btn-lg">
+                                    Submit Room
                                 </button>
                             </div>
-
-                            <!-- Image Grid -->
-
                         </div>
                     </div>
+                </div>
+                <Toastcomponents ref="toast" />
 
-                    <!-- Footer -->
-                    <button class="btn btn-secondary mb-2" @click="VisibleImagePostModal = false">Close</button>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" @click="VisibleAddModal = false">Close</button>
                 </div>
             </div>
         </div>
 
     </div>
 
+
+
+    <!--Delete Modal--->
+    <div v-if="VisibleDeleteModal" class="modal fade show d-block w-100" tabindex="-1"
+        style="background-color: rgba(0,0,0,0.5);" @click.self="VisibleDeleteModal = false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header  text-danger rounded-top-4">
+                    <h5 class="modal-title fw-bold">Delete Confirmation</h5>
+                    <button type="button" class="btn-close btn-close-black" @click="VisibleDeleteModal = false"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
+                    <p class="fs-5">Are you sure you want to delete this Room? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4"
+                        @click="VisibleDeleteModal = false">Cancel</button>
+                    <button type="button" class="btn btn-outline-danger px-4" @click="confirmDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---Update Modal-->
+    <div v-if="VisibleUpdateModal" class="modal fade show d-block w-100" tabindex="-1"
+        style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg rounded-4">
+                <div class="modal-header  text-black">
+                    <h5 class="modal-title">Update Room</h5>
+                    <button type="button" class="btn-close" @click="VisibleUpdateModal = false"></button>
+                </div>
+
+                <div class="modal-body px-3 px-md-4">
+                    <!-- Dorm Selector -->
+                    <div class="mb-4 d-flex align-items-center gap-2">
+
+                    </div>
+                    <div class="border border-secondary rounded-3 p-4 mb-3 text-center" style="cursor: pointer;"
+                        @click="edittriggerroomImagePreview3">
+                        <input ref="editRoomsImages3Input" class="d-none" type="file" accept="image/*"
+                            @change="edithandleroomImagePreview3" />
+
+                        <!-- Icon + Text -->
+                        <div class="d-flex flex-column align-items-center text-center mb-3">
+                            <h5 class="text-secondary mt-2">Click to Update Room Image</h5>
+                            <small class="text-muted">Click to browse and select an image file</small>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div v-if="editData.roomImagePreview" class="text-center mb-3">
+                        <img :src="editData.roomImagePreview" alt="Uploaded Room Image" class="img-fluid rounded mb-2"
+                            style="max-height: 250px;" />
+
+                    </div>
+                    <div class="row g-4">
+                        <!-- Column 1 -->
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" readonly placeholder="Dorm ID"
+                                    v-model="editData.dormitory_id">
+                                <label>Dorm ID</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input type="text" class="form-control" id="roomNumber" placeholder="Room Number"
+                                    v-model="editData.room_number">
+                                <label for="roomNumber">Room Number</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.room_number">{{
+                                errors.editData.room_number[0]
+                            }}</span>
+                            <div class="form-floating mb-2 mt-2">
+                                <input type="number" class="form-control" id="areaSqm" v-model="editData.area_sqm"
+                                    min="1" placeholder="Enter area in sqm" required>
+                                <label for="areaSqm">Area (sqm)</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.area_sqm">{{
+                                errors.editData.area_sqm[0]
+                            }}</span>
+
+
+                            <div class="form-floating mb-2 mt-2">
+                                <select class="form-select" id="room_type" v-model="editData.room_type">
+                                    <option value="" disabled>
+                                        Select Room Type</option>
+                                    <option value="Single Room">Single Room</option>
+                                    <option value="Double Room / Shared Room">Double Room / Shared Room</option>
+                                    <option value="Bedspace / Multi-Sharing Room">Bedspace / Multi-Sharing Room</option>
+                                    <option value="Studio-Type Room">Studio-Type Room</option>
+                                    <option value="Partitioned Bedspace (Cubicle Style)">Partitioned Bedspace (Cubicle
+                                        Style)</option>
+                                    <option value="Loft Room / Mezzanine Type">Loft Room / Mezzanine Type</option>
+                                </select>
+                                <label for="room_type">Room Type</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.room_type">{{
+                                errors.editData.room_type[0]
+                            }}</span>
+                            <div class="form-floating mb-2">
+                                <select class="form-select" id="availability" v-model="editData.availability">
+                                    <option value="" selected>Select Availability</option>
+                                    <option v-for="slot in editavailibilityArray" :key="slot" :value="slot">
+                                        {{ slot }}
+                                    </option>
+                                </select>
+                                <label for="availability">Availability Status</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.availability">{{
+                                errors.editData.availability[0]
+                            }}</span>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="col-md-6">
+                            <div class="form-floating mb-2">
+                                <input type="number" class="form-control" id="price" placeholder="Price"
+                                    v-model="editData.price" min="0" step="0.01">
+                                <label for="price">Price (₱)</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.price">{{
+                                errors.editData.price[0]
+                            }}</span>
+                            <div class="form-floating mb-2 mt-2">
+                                <select class="form-select" id="bedType" v-model="editData.listing_type" required>
+                                    <option value="" disabled>Select Bed Type</option>
+                                    <option v-for="bed in editfilteredBeds" :key="bed" :value="bed">
+                                        {{ bed }}
+                                    </option>
+                                </select>
+                                <label for="bedType">Bed Type</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.listing_type">{{
+                                errors.editData.listing_type[0]
+                            }}</span>
+
+                            <div class="form-floating mb-2 mt-2">
+                                <select class="form-select" id="furnishingStatus" v-model="editData.furnishing_status"
+                                    required>
+                                    <option value="" disabled selected>Select Furnishing Status</option>
+                                    <option value="Fully Furnished">Fully Furnished</option>
+                                    <option value="Semi Furnished">Semi Furnished</option>
+                                    <option value="Unfurnished">Unfurnished</option>
+                                </select>
+                                <label for="furnishingStatus">Furnishing Status</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.furnishing_status">{{
+                                errors.editData.furnishing_status[0]
+                            }}</span>
+                            <div class="form-floating mb-2 mt-2">
+                                <select class="form-select" id="genderPreference" v-model="editData.gender_preference"
+                                    required>
+                                    <option value="" disabled selected>Select Gender Preference</option>
+                                    <option value="Male Only">Male Only</option>
+                                    <option value="Female Only">Female Only</option>
+                                    <option value="Any Gender">Any Gender</option>
+                                </select>
+                                <label for="genderPreference">Gender Preference</label>
+                            </div>
+                            <span class="text-danger small" v-if="errors.editData?.gender_preference">{{
+                                errors.editData.gender_preference[0]
+                            }}</span>
+
+                            <div class="d-flex align-items-center mb-2">
+                                <button class="btn btn-outline-danger me-2" @click="editdecrementcapacity">-</button>
+                                <div class="flex-grow-1">
+                                    <input type="text" readonly class="form-control" id="capacity"
+                                        v-model="editData.capacity" placeholder="0">
+                                </div>
+                                <button class="btn btn-outline-success ms-2" @click="editincrementcapacity">+</button>
+                            </div>
+
+                            <span class="text-danger small" v-if="errors.editData?.capacity">{{
+                                errors.editData.capacity[0]
+                            }}</span>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" @click="updateRoom" class="btn btn-outline-primary btn-lg">
+                                    Update Room
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Toastcomponents ref="toast" />
+
+
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" @click="VisibleUpdateModal = false">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--Display Data Modal-->
+    <div v-if="VisibleDisplayDataModal" class="modal fade show d-block w-100" tabindex="-1"
+        style="background-color: rgba(0,0,0,0.5);" @click.self="VisibleDisplayDataModal = false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <!-- Modal Header -->
+                <div class="modal-header bg-outline-primary text-black  rounded-top-4">
+                    <h5 class="modal-title">Room Details</h5>
+                    <button type="button" class="btn-close btn-close-black" @click="VisibleDisplayDataModal = false"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto; padding: 1.5rem;">
+                    <img :src="selectedRoom?.room_images" class="img-fluid mb-3" alt="...">
+                    <div class="row g-4 ">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Room Number:</label>
+                                <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.room_number
+                                }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Room Type:</label>
+                                <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.room_type
+                                }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Price:</label>
+                                <div class="p-2 border rounded bg-light text-break">₱{{ selectedRoom?.price }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Capacity:</label>
+                                <div class="p-2 border rounded bg-light text-break">{{ selectedRoom?.capacity }}
+                                </div>
+                            </div>
+                            <label class="form-label fw-bold">Dorm Name:</label>
+                            <div class="p-2 border rounded bg-light text-break w-100"
+                                style="max-height: 100px;  overflow-y: auto;">
+                                {{ selectedRoom?.dorm_name
+                                }}
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 ">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Availability:</label>
+                                <div class="p-2 border rounded bg-light text-break">
+                                    <span class="badge"
+                                        :class="selectedRoom?.availability === 'Available' ? 'bg-success' : selectedRoom?.availability === 'Occupied' ? 'bg-danger' : 'bg-warning'">
+                                        {{ selectedRoom?.availability }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Contact Email:</label>
+                                <div class="p-2 border rounded bg-light text-break"> {{
+                                    selectedRoom?.contact_email
+                                }}
+
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Contact Phone:</label>
+                                <div class="p-2 border rounded bg-light text-break">{{
+                                    selectedRoom?.contact_phone
+                                }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Registration Date:</label>
+                                <div class="p-2 border rounded bg-light text-break">2023-01-01</div>
+
+                                <div class="mb-0 mt-3">
+
+                                    <label class="form-label fw-bold">Address:</label>
+                                    <div class="p-2 border rounded bg-light text-break w-100"
+                                        style="max-height: 100px;  overflow-y: auto;">
+                                        {{ selectedRoom?.address
+                                        }}
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-success px-4"
+                        @click="VisibleDisplayDataModal = false">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Images Post Modal-->
+
+
+
+    <Modalconfirmation ref="modal" />
+
 </template>
 
 <script>
 import axios from 'axios';
 import Toastcomponents from '@/components/Toastcomponents.vue';
+import Loader from '@/components/loader.vue';
+import Modalconfirmation from '@/components/modalconfirmation.vue';
 
 
 export default {
     components: {
-        Toastcomponents
+        Toastcomponents,
+        Loader,
+        Modalconfirmation
+
 
     },
     data() {
@@ -553,27 +586,56 @@ export default {
             VisibleDeleteModal: false,
             VisibleUpdateModal: false,
             VisibleDisplayDataModal: false,
-            VisibleImagePostModal: false,
-            steps: ["Upload Images 1 ", "Upload Images 2", "Upload Images 3"],
-            currentStep: 0,
-            roomImage1Preview: "",
-            roomImage1File: "",
-            roomImage2Preview: "",
-            roomImage2File: "",
-            roomImage3Preview: "",
-            roomImage3File: "",
             loading: false,
             dorms: window.allRooms || [],
             dormsId: "",
             roomNumber: "",
             roomType: "",
             availability: '',
-            availibilityArray: ['Available', 'Occupied', 'Under Maintenance'],
+            availibilityArray: ['Available'],
+            editavailibilityArray: ['Available', 'Under Maintenance'],
             price: "",
-            amenities: "",
             capacity: '',
-            amenitiesModal: false,
-            amenities: [''],
+            listing_type: '',
+            bedOptions: {
+                'Single Room': ['Single Bed', 'Private Room with Bed'],
+                'Double Room / Shared Room': ['Single Bed', 'Shared Bed'],
+                'Bedspace / Multi-Sharing Room': ['Bunk Bed', 'Double Deck (Lower)', 'Double Deck (Upper)'],
+                'Studio-Type Room': ['Private Room with Bed'],
+                'Partitioned Bedspace (Cubicle Style)': ['Single Bed'],
+                'Loft Room / Mezzanine Type': ['Single Bed', 'Bunk Bed']
+            },
+            area_sqm: '',
+            gender_preference: '',
+            furnishing_status: '',
+            roomImagePreview: '',
+            roomImageFile: '',
+            getRoomID: '',
+            editSelectedID: '',
+            editData:
+            {
+                dormitory_id: '',
+                room_number: '',
+                room_type: '',
+                availability: '',
+                price: '',
+                amenities: '',
+                capacity: '',
+                listing_type: '',
+                bedOptions: {
+                    'Single Room': ['Single Bed', 'Private Room with Bed'],
+                    'Double Room / Shared Room': ['Single Bed', 'Shared Bed'],
+                    'Bedspace / Multi-Sharing Room': ['Bunk Bed', 'Double Deck (Lower)', 'Double Deck (Upper)'],
+                    'Studio-Type Room': ['Private Room with Bed'],
+                    'Partitioned Bedspace (Cubicle Style)': ['Single Bed'],
+                    'Loft Room / Mezzanine Type': ['Single Bed', 'Bunk Bed']
+                },
+                area_sqm: '',
+                gender_preference: '',
+                capacity: '',
+                roomImagePreview: '',
+                roomImageFile: '',
+            },
             errors: {},
             rooms: [],
             selectedRoom: null,
@@ -584,44 +646,63 @@ export default {
         dormId(dorm) {
             this.dormsId = dorm.dorm_id;
         },
-        addAmenity() {
-            this.amenities.push('');
-        },
-        submitAmenities() {
-            console.log('Amenities:', this.amenities.filter(a => a.trim() !== ''));
-            alert("Amenities submitted: " + this.amenities.filter(a => a.trim() !== '').join(', '));
-            this.amenitiesModal = false;
-        },
-        validateForm() {
-            this.errors = {};
-            if (!this.roomNumber) {
-                this.errors.roomNumber = ["Room number is required."];
-            }
-            if (!this.roomType) {
-                this.errors.roomType = ["Room type is required."];
-            }
-            if (!this.availability) {
-                this.errors.availability = ["Availability status is required."];
-            }
-            if (!this.price || isNaN(this.price) || this.price <= 0) {
-                this.errors.price = ["Valid price is required."];
-            }
 
 
-            if (!this.capacity || isNaN(this.capacity) || this.capacity < 0) {
-                this.errors.capacity = ["Valid capacity  are required."];
+        decrementcapacity() {
+            if (this.capacity > this.roomCapacityRange.min) {
+                this.capacity--;
             }
-
-            if (Object.keys(this.errors).length > 0) {
-                return false;
-            }
-            return true;
         },
+        incrementcapacity() {
+            if (this.capacity < this.roomCapacityRange.max) {
+                this.capacity++;
+            }
+        },
+        handleroomImagePreview3(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Create object URL and revoke previous one if exists
+                if (this.roomImagePreview) {
+                    URL.revokeObjectURL(this.roomImagePreview);
+                }
+                this.roomImageFile = file;
+
+
+                this.roomImagePreview = URL.createObjectURL(file);
+            }
+        },
+        triggerroomImagePreview3() {
+            if (this.$refs.RoomsImages3Input) {
+                this.$refs.RoomsImages3Input.click();
+            }
+        },
+
+        removeroomImagePreviews3() {
+            if (this.roomImagePreview) {
+                URL.revokeObjectURL(this.roomImagePreview);
+            }
+            this.roomImagePreview = null;
+            this.roomImageFile = '';
+
+            // Add null check for safety
+            if (this.$refs.roomImagePreview) {
+                this.$refs.roomImagePreview.value = ''; // Reset file input
+            }
+        },
+
         async submitRoom() {
-            if (!this.validateForm()) {
-                alert("Please fix the errors in the form.");
+            const confirmed = await this.$refs.modal.show({
+                title: 'Confirm New Room',
+                message: 'Do you want to add this room now?',
+                functionName: 'Add Room'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
                 return;
             }
+            this.$refs.loader.loading = true;
+
             try {
                 const formData = new FormData();
                 formData.append('dormsId', this.dormsId);
@@ -630,6 +711,11 @@ export default {
                 formData.append('availability', this.availability);
                 formData.append('price', this.price);
                 formData.append('capacity', this.capacity);
+                formData.append('listing_type', this.listing_type);
+                formData.append('area_sqm', this.area_sqm);
+                formData.append('gender_preference', this.gender_preference);
+                formData.append('furnishing_status', this.furnishing_status);
+                formData.append('roomImageFile', this.roomImageFile);
                 const response = await axios.post('/addRoom', formData, {
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -637,23 +723,37 @@ export default {
                 });
 
                 if (response.data.status === "success") {
-                    alert("Room added successfully!");
-                    this.errors = {};
-                } else if (response.data.error) {
-                    this.errors = response.data.error;
-                }
-            }
-            catch (error) {
-                if (error.response) {
-                    console.log('Error data:', error.response.data);
-                    console.log('Input data that caused error:', error.response.data.input);
+                    this.$refs.toast.showToast(response.data.message, 'success');
+                    this.$refs.loader.loading = false;
+                    this.fetchRooms();
+                    this.emptyfill();
+                    this.getRoomID = response.data.room_id;
+                } else if (response.data.errors) {
+                    this.$refs.loader.loading = false;
+
+                    this.errors = response.data.errors;
                 }
 
-                return;
+            } catch (error) {
+                this.$refs.loader.loading = false;
+
+                if (error.response && error.response.status === 422) {
+                    this.errors = error.response.data.errors;
+                    this.$refs.toast.showToast('Please check your fields', 'danger');
+
+
+                } else {
+                    this.$refs.loader.loading = false;
+
+                    console.error('Unexpected error:', error);
+                    this.$refs.toast.showToast('Something went wrong.', 'error');
+                }
             }
-            this.amenitiesModal = true;
         },
+
         async fetchRooms() {
+            this.$refs.loader.loading = true;
+
             try {
                 const response = await axios.get('/ListRooms', {
                     headers: {
@@ -661,12 +761,15 @@ export default {
                     }
                 });
                 this.rooms = response.data.rooms || [];
+                this.$refs.loader.loading = false;
+
             } catch (error) {
                 console.error('Error fetching rooms:', error);
             }
         },
         async ViewRoom(roomId) {
             try {
+                this.$refs.loader.loading = true;
 
                 const response = await axios.get(`/ViewRoom/${roomId}`, {
                     headers: {
@@ -674,6 +777,8 @@ export default {
                     }
                 });
                 if (response.data.status === "success") {
+                    this.$refs.loader.loading = false;
+                    this.fetchRooms();
                     this.selectedRoom = response.data.room;
                     this.VisibleDisplayDataModal = true;
                 } else {
@@ -685,138 +790,223 @@ export default {
             }
 
         },
-        confirmDelete() {
-            alert("delete");
-            this.VisibleDeleteModal = false;
 
-        },
-        UpdateRoom() {
-            alert("Update");
-        },
-        DeleteRoom() {
-            alert("Delete");
-
-        },
-
-        prevStep() {
-            if (this.currentStep > 0) {
-                this.currentStep--;
+        editdecrementcapacity() {
+            if (this.editData.capacity > this.editroomCapacityRange.min) {
+                this.editData.capacity--;
             }
         },
-        goToStep(index) {
-            if (index <= this.currentStep) {
-                this.currentStep = index;
+        editincrementcapacity() {
+            if (this.editData.capacity < this.editroomCapacityRange.max) {
+                this.editData.capacity++;
             }
         },
-        nextStep() {
-            if (this.currentStep < this.steps.length - 1) {
-                let isValid = true;
 
-                if (this.currentStep === 0) {
-                    isValid = this.UploadImages1();
+        async editRoom(roomId) {
+
+            this.$refs.loader.loading = true;
+
+            try {
+                const response = await axios.get(`/ViewRoom/${roomId}`);
+                if (response.data.status === "success") {
+                    this.$refs.loader.loading = false;
+                    this.editData = {
+
+                        ...response.data.room,
+                        room_id: roomId,
+                        roomImagePreview: response.data.room.room_images || "",
 
 
+                    };
 
-                } else if (this.currentStep === 1) {
-                    isValid = this.UploadImages2();
+                    this.VisibleUpdateModal = true;
+                    this.editSelectedID = roomId;
+
+                } else {
+                    console.error("Failed to fetch dorm details:", response.data.message);
+                    alert("Failed to load dorm details for editing");
                 }
+            } catch (error) {
+                console.error("Error fetching dorm details:", error);
+                alert("An error occurred while loading dorm details");
             }
         },
-        UploadImages1() {
-            this.currentStep = 1;
+        editroom_type(newType) {
+            const ranges = {
+                'Single Room': { min: 1, max: 1 },
+                'Double Room / Shared Room': { min: 1, max: 2 },
+                'Studio-Type Room': { min: 1, max: 3 },
+                'Loft Room / Mezzanine Type': { min: 2, max: 4 },
+                'Partitioned Bedspace (Cubicle Style)': { min: 1, max: 1 },
+                'Bedspace / Multi-Sharing Room': { min: 4, max: 6 },
+            };
+            const selectedRange = ranges[newType] || { min: 0, max: 0 };
+            this.editData.capacity = selectedRange.min;
         },
-        UploadImages2() {
-            this.currentStep = 2;
-        },
-
-
-        //Room Images Picture
-        handleroomImage1(event) {
+        edithandleroomImagePreview3(event) {
             const file = event.target.files[0];
             if (file) {
-                // Create object URL and revoke previous one if exists
-                if (this.roomImage1Preview) {
-                    URL.revokeObjectURL(this.roomImage1Preview);
+                // Update both preview and file
+                this.editData.roomImagePreview = URL.createObjectURL(file);
+                this.editData.roomImageFile = file;
+            } else {
+                // If no file is selected, reset to existing preview and clear file
+                this.editData.roomImageFile = null;
+            }
+        },
+        edittriggerroomImagePreview3() {
+            if (this.$refs.editRoomsImages3Input) {
+                this.$refs.editRoomsImages3Input.click();
+            }
+        },
+        async updateRoom() {
+            const confirmed = await this.$refs.modal.show({
+                title: 'Confirm Update',
+                message: 'Are you sure you want to update the details of this room? This action will overwrite the existing information.',
+                functionName: 'Update Room'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
+                return;
+            }
+
+            this.$refs.loader.loading = true;
+
+            const formData = new FormData();
+
+            formData.append('dormitory_id', this.editData.dormitory_id);
+            formData.append('room_number', this.editData.room_number);
+            formData.append('room_type', this.editData.room_type);
+            formData.append('availability', this.editData.availability);
+            formData.append('price', this.editData.price);
+            formData.append('capacity', this.editData.capacity);
+            formData.append('listing_type', this.editData.listing_type);
+            formData.append('area_sqm', this.editData.area_sqm);
+            formData.append('gender_preference', this.editData.gender_preference);
+            formData.append('furnishing_status', this.editData.furnishing_status);
+            if (this.editData.roomImageFile) {
+                // User selected a new image file, send it
+                formData.append('roomImageFile', this.editData.roomImageFile);
+                formData.append('isNewImage', 'true'); // Optional flag to indicate new image uploaded
+            } else if (this.editData.roomImagePreview) {
+                // No new file, send the current image path or name to keep it
+                formData.append('existingImage', this.editData.roomImagePreview);
+                formData.append('isNewImage', 'false'); // Optional flag
+            } else {
+                // No image at all — handle accordingly (maybe send empty or alert user)
+                formData.append('existingImage', '');
+                formData.append('isNewImage', 'false');
+            }
+            try {
+                const response = await axios.post(`/update-room/${this.editSelectedID}`, formData, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+
+
+                    },
+                });
+
+                if (response.data.status === "success") {
+                    this.fetchRooms();
+                    this.$refs.toast.showToast(response.data.message);
+                    this.VisibleUpdateModal = false;
+                    this.errors = {};
+                } else if (response.data.errors) {
+                    this.errors = response.data.errors;
                 }
-                this.roomImage1File = file;
+            } catch (error) {
+                if (error.response && error.response.status === 422) {
+                    this.errors = {
+                        editData: error.response.data.errors
+                    };
+                    this.$refs.toast.showToast('Please check your fields', 'danger');
 
-                this.roomImage1Preview = URL.createObjectURL(file);
-            }
-        },
-        triggerRoomImage1() {
-            if (this.$refs.RoomsImages1Input) {
-                this.$refs.RoomsImages1Input.click();
-            }
-        },
-
-        removeRoomImages1() {
-            if (this.roomImage1Preview) {
-                URL.revokeObjectURL(this.roomImage1Preview);
-            }
-            this.roomImage1Preview = null;
-            // Add null check for safety
-            if (this.$refs.roomImage1Preview) {
-                this.$refs.roomImage1Preview.value = ''; // Reset file input
-            }
-        },
-        //image 2
-        handleroomImage2(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Create object URL and revoke previous one if exists
-                if (this.roomImage2Preview) {
-                    URL.revokeObjectURL(this.roomImage2Preview);
+                    this.$refs.loader.loading = false;
                 }
-                this.roomImage2File = file;
+            } finally {
+                this.$refs.loader.loading = false;
+            }
 
-                this.roomImage2Preview = URL.createObjectURL(file);
-            }
-        },
-        triggerRoomImage2() {
-            if (this.$refs.RoomsImages2Input) {
-                this.$refs.RoomsImages2Input.click();
-            }
-        },
 
-        removeRoomImages2() {
-            if (this.roomImage2Preview) {
-                URL.revokeObjectURL(this.roomImage2Preview);
-            }
-            this.roomImage2Preview = null;
-            // Add null check for safety
-            if (this.$refs.roomImage2Preview) {
-                this.$refs.roomImage2Preview.value = ''; // Reset file input
-            }
+
         },
-        //image 3
-        handleroomImage3(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Create object URL and revoke previous one if exists
-                if (this.roomImage3Preview) {
-                    URL.revokeObjectURL(this.roomImage3Preview);
+        async deleteRoom(roomId) {
+            this.currentRoomID = roomId;
+            const confirmed = await this.$refs.modal.show({
+                title: 'Delete Room?',
+                message: 'This will permanently remove the room. Proceed?',
+                functionName: 'Delete Room'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
+                return;
+            }
+            this.$refs.loader.loading = true; // Show loading indicator
+            try {
+                const response = await axios.delete(`/DeleteRoom/${this.currentRoomID}`, {}, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                if (response.data.status === "success") {
+                    this.fetchRooms();
+
+                    this.$refs.loader.loading = false;
+
+                    this.$refs.toast.showToast(response.data.message, 'success');
+
+                    this.VisibleDeleteModal = false; // Close the modal
                 }
-                this.roomImage3File = file;
+                else {
+                    this.$refs.toast.showToast(response.data.message, 'error');
+                }
+            }
+            catch (error) {
+                console.error('Error deleting room:', error);
+                this.$refs.toast.showToast('Failed to delete room.', 'error');
+            } finally {
+                this.$refs.loader.loading = false; // Hide loading indicator
 
-                this.roomImage3Preview = URL.createObjectURL(file);
-            }
-        },
-        triggerRoomImage3() {
-            if (this.$refs.RoomsImages3Input) {
-                this.$refs.RoomsImages3Input.click();
             }
         },
 
-        removeRoomImages3() {
-            if (this.roomImage3Preview) {
-                URL.revokeObjectURL(this.roomImage3Preview);
-            }
-            this.roomImage3Preview = null;
-            // Add null check for safety
-            if (this.$refs.roomImage3Preview) {
-                this.$refs.roomImage3Preview.value = ''; // Reset file input
-            }
+
+        updateEmpty() {
+            this.editData = {
+                room_id: '',
+                room_number: '',
+                room_type: '',
+                availability: '',
+                price: '',
+                capacity: '',
+                listing_type: '',
+                area_sqm: '',
+                gender_preference: '',
+                capacity: '',
+                roomImagePreview: '',
+                roomImageFile: '',
+
+            };
+            this.errors = {};
         },
+        emptyfill() {
+
+            this.dormsId = "";
+            this.roomNumber = "";
+            this.roomType = "";
+            this.availability = '';
+            this.price = "";
+            this.capacity = '';
+            this.amenities = "";
+            this.listing_type = '';
+            this.area_sqm = '';
+            this.gender_preference = '';
+            this.roomImagePreview = '';
+            this.roomImageFile = '';
+            this.errors = {};
+        }
 
 
 
@@ -824,6 +1014,7 @@ export default {
     },
     mounted() {
         this.fetchRooms();
+
     },
     computed: {
         filteredRooms() {
@@ -833,8 +1024,55 @@ export default {
                     String(val).toLowerCase().includes(this.searchTerm.toLowerCase())
                 )
             );
-        }
+        },
+        filteredBeds() {
+            return this.bedOptions[this.roomType] || [];
+        },
+        editfilteredBeds() {
+            return this.bedOptions[this.editData.room_type] || [];
+        },
+
+        roomCapacityRange() {
+            const ranges = {
+                'Single Room': { min: 1, max: 1 },
+                'Double Room / Shared Room': { min: 1, max: 2 },
+                'Studio-Type Room': { min: 1, max: 3 },
+                'Loft Room / Mezzanine Type': { min: 2, max: 4 },
+                'Partitioned Bedspace (Cubicle Style)': { min: 1, max: 1 },
+                'Bedspace / Multi-Sharing Room': { min: 4, max: 6 },
+            };
+            return ranges[this.roomType] || { min: 0, max: 0 };
+        },
+
+        editroomCapacityRange() {
+            const ranges = {
+                'Single Room': { min: 1, max: 1 },
+                'Double Room / Shared Room': { min: 1, max: 2 },
+                'Studio-Type Room': { min: 1, max: 3 },
+                'Loft Room / Mezzanine Type': { min: 2, max: 4 },
+                'Partitioned Bedspace (Cubicle Style)': { min: 1, max: 1 },
+                'Bedspace / Multi-Sharing Room': { min: 4, max: 6 },
+            };
+            return ranges[this.editData.room_type] || { min: 0, max: 0 };
+        },
     },
+    watch: {
+
+        roomType(newType) {
+            const ranges = {
+                'Single Room': { min: 1, max: 1 },
+                'Double Room / Shared Room': { min: 1, max: 2 },
+                'Studio-Type Room': { min: 1, max: 3 },
+                'Loft Room / Mezzanine Type': { min: 2, max: 4 },
+                'Partitioned Bedspace (Cubicle Style)': { min: 1, max: 1 },
+                'Bedspace / Multi-Sharing Room': { min: 4, max: 6 },
+            };
+            const selectedRange = ranges[newType] || { min: 0, max: 0 };
+            this.capacity = selectedRange.min;
+        },
+
+    },
+
 };
 </script>
 
@@ -842,127 +1080,5 @@ export default {
 .table-responsive {
     border-radius: 10px;
     overflow: hidden;
-}
-
-.file-upload-btn:hover {
-    background: #1AA059;
-    color: #ffffff;
-    transition: all .2s ease;
-    cursor: pointer;
-}
-
-.file-upload-btn:active {
-    border: 0;
-    transition: all .2s ease;
-}
-
-.file-upload-content {
-    display: none;
-    text-align: center;
-}
-
-.file-upload-input {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    outline: none;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.image-upload-wrap {
-    margin-top: 20px;
-    border: 4px dashed #4edce2;
-    position: relative;
-}
-
-.image-dropping,
-.image-upload-wrap:hover {
-    background-color: #4edce2;
-    border: 4px dashed #ffffff;
-}
-
-.image-title-wrap {
-    padding: 0 15px 15px 15px;
-    color: #222;
-}
-
-.drag-text {
-    text-align: center;
-}
-
-.drag-text h3 {
-    font-weight: 100;
-    text-transform: uppercase;
-    color: black;
-    padding: 60px 0;
-}
-
-.file-upload-image {
-    max-height: 200px;
-    max-width: 200px;
-    margin: auto;
-    padding: 20px;
-}
-
-.remove-image {
-    width: 200px;
-    margin: 0;
-    color: black;
-    background: #4edce2;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    border-bottom: 4px solid #b02818;
-    transition: all .2s ease;
-    outline: none;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.remove-image:hover {
-    background: #4edce2;
-    color: black;
-    transition: all .2s ease;
-    cursor: pointer;
-}
-
-.remove-image:active {
-    border: 0;
-    transition: all .2s ease;
-}
-
-.file-upload-input {
-    display: none;
-}
-
-.image-upload-wrap {
-    border: 2px dashed #ddd;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-.file-upload-content {
-    display: block;
-    margin-top: 20px;
-}
-
-.file-upload-image {
-    max-width: 100%;
-    max-height: 300px;
-    margin: 0 auto;
-    display: block;
-}
-
-.remove-image {
-    background: none;
-    border: none;
-    color: #ff0000;
-    cursor: pointer;
-    margin-top: 10px;
 }
 </style>

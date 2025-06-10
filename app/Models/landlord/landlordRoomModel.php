@@ -24,7 +24,11 @@ class landlordRoomModel extends Model
         'room_type',
         'availability',
         'price',
-        'capacity',
+        'furnishing_status',
+        'listing_type',
+        'area_sqm',
+        'gender_preference',
+        'room_images',
         'created_at',
         
     ];
@@ -33,4 +37,6 @@ class landlordRoomModel extends Model
     return $this->belongsTo(landlordDormManagement::class, 'dormitory_id', 'dorm_id');
 }
 
+
 }
+
