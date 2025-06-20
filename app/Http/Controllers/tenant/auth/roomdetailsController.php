@@ -31,15 +31,21 @@ class roomdetailsController extends Controller
         $title = 'Tenant room Details - Dormhub';
         return view('tenant.auth.roomdetails',['title' => 'Room Details',
         'dormitory_id' => $dormitory_id,
-        'tenant_id',$tenant]);
+        'tenant_id',$tenant,'cssPath' => asset('css/tenantpage/auth/roomdetails.css')]);
     }
     public function ViewDorms(Request $request)
     {
        
 
         $dormitory_id = $request->query('dormitory_id');
-        $dorm = landlordDormManagement::with(['amenities','images','rooms','landlord'])->where('dorm_id',$dormitory_id)
-        ->first();
+        $dorm = landlordDormManagement::with([
+            'amenities',
+            'images',
+            'landlord',
+            'rooms' => function ($query) {
+                $query->where('availability', 'Available');
+            }
+        ])->where('dorm_id', $dormitory_id)->first(); 
         $totalCapacity = $dorm->totalCapacity();
 
         if (!$dorm) {
@@ -138,6 +144,7 @@ class roomdetailsController extends Controller
     {
         $validatedData = $request->validate([
             'dormitory_id'     => 'integer|required',
+            'landlord_id'       => 'string|required',
             'firstname'        => 'required|string|max:255',
             'lastname'         => 'required|string|max:255',
             'contactInfo'      => 'required|string|max:255',
@@ -163,6 +170,7 @@ class roomdetailsController extends Controller
             $book = new tenantscreeningModel();
             
             $book->fkdormitory_id = $validatedData['dormitory_id'];
+            $book->landlord_id = $validatedData['landlord_id'];
             $book->fkroom_id = $validatedData['room_id'];
             $book->fktenant_id = $tenant_id;
             $book->firstname = $validatedData['firstname'];

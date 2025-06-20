@@ -15,6 +15,9 @@ import Notification from './components/landlord/auth/Notification.vue';
 import homepage from './components/tenants/auth/homepage.vue';
 import tenant from './components/tenants/tenantLogin.vue';
 import RoomDetails from './components/tenants/auth/roomdetails.vue';
+import dormitoriesMap from './components/tenants/auth/dormitoriesmap.vue';
+import dormitories from './components/tenants/auth/dormitories.vue';
+
 
 import AOS from 'aos';
 import 'aos/dist/aos.css'
@@ -94,5 +97,18 @@ if (RoomDetailsController) {
     createApp(RoomDetails).mount('#RoomDetails');
 
 }
+const dormitoriesMapController = document.querySelector('#dormitoriesMap');
+
+if (dormitoriesMapController) {
+    createApp(dormitoriesMap).mount('#dormitoriesMap');
+
+}
+const dormitoriesController = document.querySelector('#dormitories');
+
+if (dormitoriesController) {
+    createApp(dormitories).mount('#dormitories');
+
+}
+
 
 

@@ -1,4 +1,5 @@
 <template>
+
     <div class="container mt-5">
         <Loader ref="loader" />
         <Toastcomponents ref="toast" />
@@ -441,7 +442,6 @@
                         </div>
                     </div>
                 </div>
-                <Toastcomponents ref="toast" />
 
 
                 <div class="modal-footer">
@@ -909,7 +909,7 @@ export default {
 
                 if (response.data.status === "success") {
                     this.fetchRooms();
-                    this.$refs.toast.showToast(response.data.message);
+                    this.$refs.toast.showToast(response.data.message, 'success');
                     this.VisibleUpdateModal = false;
                     this.errors = {};
                 } else if (response.data.errors) {

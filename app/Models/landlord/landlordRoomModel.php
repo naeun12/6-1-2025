@@ -29,6 +29,7 @@ class landlordRoomModel extends Model
         'area_sqm',
         'gender_preference',
         'room_images',
+        'capacity',
         'created_at',
         
     ];

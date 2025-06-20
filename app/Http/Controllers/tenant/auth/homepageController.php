@@ -15,6 +15,7 @@ class homepageController extends Controller
 {
     public function homepage($tenant_id)
     {
+        
         $sessionTenant_id = session('tenant_id');
     
         if (!$sessionTenant_id) {
@@ -30,19 +31,31 @@ class homepageController extends Controller
             return redirect()->route('tenant-login')->with('error', 'Landlord not found.');
         }
         return view('tenant.auth.homepage',['title' => 'Room Details  - Dormhub',
-        'tenant_id',$tenant]);
+        'tenant_id',$tenant,'cssPath' => asset('css/tenantpage/auth/home.css')]);
 
     }
-    public function Listdorms()
-    {
-        $dorms = landlordDormManagement::with(['amenities','images'])->get();
-        return response()->Json([
-            'status' => 'success',
-            'dorms' => $dorms,
-        ]);
-    }
-    public function ViewDoorms()
-    {
-        
-    }
+    public function dormLapuLapu()
+{
+    return response()->json(
+        landlordDormManagement::where('address', 'LIKE', '%Lapu-Lapu%')
+            ->select('dorm_id', 'dorm_name', 'address', 'latitude', 'longitude')
+            ->with(['images' => function ($query) {
+                $query->select('dormitory_id', 'main_image');
+            }])
+            ->get()
+    );
+}
+
+public function dormMandaeu()
+{
+    return response()->json(
+        landlordDormManagement::where('address', 'LIKE', '%Mandaue%')
+            ->select('dorm_id', 'dorm_name', 'address', 'latitude', 'longitude')
+            ->with(['images' => function ($query) {
+                $query->select('dormitory_id', 'main_image');
+            }])
+            ->get()
+    );
+}
+
 }

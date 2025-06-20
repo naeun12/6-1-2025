@@ -1,7 +1,7 @@
 @if (session('landlord_logged_in'))
     <header class="bg-white nav-header py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
         <button class="btn btn-primary d-md-none" type="button" id="sidebarToggle" aria-label="Toggle sidebar">
-            <span class="navbar-toggler-icon"></span>
+            <i class="fas fa-bars"></i>
         </button>
 
         <h4 class="text-black fs-5">{{ $headerName }}</h4>

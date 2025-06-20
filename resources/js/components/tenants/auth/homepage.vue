@@ -1,82 +1,124 @@
 <template>
-
-    <div class="container text-center mt-4 mb-5">
-        <form class="d-flex justify-content-center search-input">
-            <input class="form-control me-2 w-50" type="search" placeholder="Search Rooms locations"
-                aria-label="Search">
-            <button class="btn btn-outline-primary" type="submit">Search</button>
-        </form>
-    </div>
-    <div
-        class="container mt-3 d-flex flex-wrap align-items-center gap-3 justify-content-between bg-light p-3 rounded custom-border">
-        <ul class="list-unstyled d-flex gap-4 mb-0 order-2 ms-auto">
-            <li><a href="#" class="text-decoration-none fw-semibold text-dark">Room Reservation</a></li>
-            <li><a href="#" class="text-decoration-none fw-semibold text-dark">Tenant Submissions</a></li>
+    <!-- Top Navigation -->
+    <div class="bg-white m-3 py-3 px-2 text-center shadow-sm border-custom rounded-4">
+        <ul class="nav justify-content-center gap-2 flex-wrap">
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-feature-link">📅 Book Dormitory</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-feature-link">💸 Next Payment Due</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-feature-link">👫 My Boardmate</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-feature-link">📝 Reservation</a>
+            </li>
         </ul>
+    </div>
 
-        <div class="d-flex gap-3 justify-content-start flex-grow-1 order-1">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="priceDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
-                    Estimated Price
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="priceDropdown">
-                    <li><a class="dropdown-item" href="#">Under $100</a></li>
-                    <li><a class="dropdown-item" href="#">$100 - $300</a></li>
-                    <li><a class="dropdown-item" href="#">Above $300</a></li>
-                </ul>
+
+    <!-- Content Section -->
+    <div class="container-fluid m-2 py-5">
+        <div class="row g-4">
+            <!-- Mandaue Map -->
+            <div class="col-md-6">
+                <div class="p-4 rounded-4 shadow-sm map-card">
+                    <h2 class="h5 fw-bold mb-3 text-center text-info">Dormitories in Mandaue City</h2>
+                    <div id="map-mandaue" class="rounded-3" style="height: 400px;"></div>
+                </div>
             </div>
 
-            <div class="dropdown">
-                <button class="btn btn-outline-success dropdown-toggle" type="button" id="ratingDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
-                    Top Rating
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="ratingDropdown">
-                    <li><a class="dropdown-item" href="#">4 stars & up</a></li>
-                    <li><a class="dropdown-item" href="#">3 stars & up</a></li>
-                    <li><a class="dropdown-item" href="#">All ratings</a></li>
-                </ul>
+            <!-- Lapu-Lapu Map -->
+            <div class="col-md-6">
+                <div class="p-4 rounded-4 shadow-sm map-card">
+                    <h2 class="h5 fw-bold mb-3 text-center text-info">Dormitories in Lapu-Lapu City</h2>
+                    <div id="map" class="rounded-3" style="height: 400px;"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Announcement Header -->
 
-    <!-- Map Section -->
-    <section class="py-5 bg-light mt-4">
-        <div class="container">
-            <h2 class="text-center mb-4 fw-bold text-primary">
-                Discover Dormitories Around Lapu-Lapu and Mandaue
-            </h2>
-            <div class="row g-3">
-                <div class="col-12 col-md-6 col-lg-3 p-2" v-for="room in rooms" :key="room.room_id"
-                    data-aos="fade-right" data-aos-offset="300" data-aos-easing="ease-in-sine">
-                    <div class="dorm-card card h-100">
-                        <div class="dorm-image">
-                            <img :src="room.images?.main_image" class="card-img-top"
-                                :alt="`Image of ${room.dorm?.dorm_name || 'Dorm'}`"
-                                style="height: 200px; object-fit: cover;" />
+
+    <!-- Custom Masonry Layout -->
+    <!-- Section Header -->
+    <div class="p-4 rounded shadow-sm text-center mb-4" style="border: 1px solid #4edce2; border-radius: 20px;">
+        <h2 class="h5 fw-bold text-info">Top Rated Dormitories</h2>
+    </div>
+
+    <!-- Custom Masonry Grid Layout -->
+    <div class="m-2 py-4">
+        <div class="row g-4">
+            <!-- Large Left Card -->
+            <div class="col-md-6">
+                <div class="card h-100 dorm-card text-white bg-dark border-0">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Sunshine Dormitory</h5>
+                            <p class="card-text">Mandaue City</p>
+                            <p class="card-text">⭐ 4.8</p>
                         </div>
-                        <div class="card-header card-header-style py-3">
-                            <h5> {{ room.dorm_name || 'Available Dorm' }}</h5>
-                        </div>
-
-
-                        <div class="card-body card-body-style">
-                            <p class="location">{{ room.address || 'Location unavailable' }}</p>
-                            <p class="description">
-                                {{ room.description || 'No description available.' }}
-                            </p>
-                            <button class="btn " @click="viewDorms(room.dorm_id)">
-                                View Details
-                            </button>
+                        <div class="text-end">
+                            <a href="#" class="btn btn-outline-light">View Details</a>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- Top Right Wide Card -->
+                <div class="card mb-4 dorm-card text-white bg-dark border-0">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">Palm Grove Dorm</h5>
+                            <p class="card-text">Lapu-Lapu City</p>
+                            <p class="card-text">⭐ 4.6</p>
+                        </div>
+                        <div class="text-end">
+                            <a href="#" class="btn btn-outline-light">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Smaller Cards -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card dorm-card text-white bg-dark border-0">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title">Cityside Stay</h5>
+                                    <p class="card-text">Mandaue</p>
+                                    <p class="card-text">⭐ 4.5</p>
+                                </div>
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-outline-light">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card dorm-card text-white bg-dark border-0">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title">Lapu Cozy Dorm</h5>
+                                    <p class="card-text">Lapu-Lapu</p>
+                                    <p class="card-text">⭐ 4.7</p>
+                                </div>
+                                <div class="text-end">
+                                    <a href="#" class="btn btn-outline-light">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End Smaller Cards -->
+            </div>
         </div>
-    </section>
+    </div>
+
 
 </template>
 <script>
@@ -85,237 +127,165 @@ export default {
     data() {
         return {
             rooms: [],
+            tenant_id: '',
 
         };
     },
     methods: {
 
         viewDorms(dormitoryId) {
-            const tenant = window.tenant_id;
+            this.tenant_id = window.tenant_id;
 
-            if (!tenant) {
+            if (!this.tenant_id) {
                 alert("tenant_id id not found");
                 return;
             }
 
-            window.location.href = `/room-details/${dormitoryId}/${tenant}`;
+            window.location.href = `/room-details/${dormitoryId}/${this.tenant_id}`;
         },
-        async fetchDorms() {
-            try {
-                const response = await axios.get('/list-dorms')
-                if (response.data.status === 'success') {
-                    this.rooms = response.data.dorms;
-                }
-            }
-            catch (error) {
 
-            }
-        },
+        initMap() {
+            this.tenant_id = window.tenant_id;
+
+            const lapuLapu = { lat: 10.3090, lng: 123.9494 };
+            const mandaue = { lat: 10.3339, lng: 123.9222 };
+
+            const customStyle = [
+                {
+                    featureType: "poi",
+                    elementType: "labels",
+                    stylers: [{ visibility: "off" }]
+                }
+            ];
+
+            const mapLapu = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: lapuLapu,
+                draggable: false,
+                disableDoubleClickZoom: true,
+                mapTypeControl: false,
+                fullscreenControl: false,
+                mapTypeId: 'terrain',
+                styles: customStyle
+            });
+
+            const mapMandaue = new google.maps.Map(document.getElementById("map-mandaue"), {
+                zoom: 14,
+                center: mandaue,
+                draggable: false,
+                disableDoubleClickZoom: true,
+                mapTypeControl: false,
+                fullscreenControl: false,
+                mapTypeId: 'terrain',
+                styles: customStyle
+            });
+
+            const infoWindow = new google.maps.InfoWindow();
+
+            // Fetch Lapu-Lapu Dorms
+            axios.get('/tenant/dorms/lapu-lapu')
+                .then(response => {
+                    response.data.forEach(dorm => {
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: parseFloat(dorm.latitude),
+                                lng: parseFloat(dorm.longitude)
+                            },
+                            map: mapLapu,
+                            title: dorm.dorm_name, // Shown on hover
+                            icon: {
+                                url: '/images/tenant/allimagesResouces/dormmap.webp',
+                                scaledSize: new google.maps.Size(40, 40)
+                            }
+                        });
+
+                        const content = `
+    <div style="
+        width: 250px;
+        height: 250px;
+        border-radius: 12px;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+        background: #fefefe;
+        display: flex;
+        flex-direction: column;">
+        
+        <img src="${dorm.images.main_image}" alt="Dorm Image"
+            style="width: 100%; height: 150px; object-fit: cover; border-bottom: 1px solid #ddd;">
+        
+        <div class="mb-3" style=" flex: 1;">
+            <div style="font-size: 17px; font-weight: 600; color: #2c3e50;">
+                🏠 ${dorm.dorm_name}
+            </div>
+            <div class="mt-2">
+                <a href="/room-details/${dorm.dorm_id}/${this.tenant_id}" class="btn btn-primary w-100" style="font-size: 14px;">View Details</a>
+            </div>
+        </div>
+    </div>
+`;
+
+
+                        marker.addListener("click", () => {
+                            infoWindow.setContent(content);
+                            infoWindow.open(mapLapu, marker);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Lapu-Lapu dorms:', error);
+                });
+
+            // Fetch Mandaue Dorms
+            axios.get('/tenant/dorms/mandaue')
+                .then(response => {
+                    response.data.forEach(dorm => {
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: parseFloat(dorm.latitude),
+                                lng: parseFloat(dorm.longitude)
+                            },
+                            map: mapMandaue,
+                            title: dorm.dorm_name, // Shown on hover
+                            icon: {
+                                url: '/images/tenant/allimagesResouces/dormmap.webp',
+                                scaledSize: new google.maps.Size(40, 40)
+                            }
+                        });
+
+                        const content = `
+                    <div>
+                        <strong>Dorm Name:</strong> ${dorm.dorm_name}<br>
+                        <strong>ID:</strong> ${dorm.id}
+                    </div>
+                `;
+
+                        marker.addListener("click", () => {
+                            infoWindow.setContent(content);
+                            infoWindow.open(mapMandaue, marker);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching Mandaue dorms:', error);
+                });
+        }
 
 
     },
     mounted() {
+        // Load Google Maps script dynamically
+        const script = document.createElement("script");
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCyQYH_O-3v9vW6ba_V653qgVECSxII0GU&callback=initMap";
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
 
-        this.fetchDorms();
-    }
+        // Attach initMap function globally
+        window.initMap = this.initMap;
+        this.tenant_id = window.tenant_id;
 
-
+    },
 }
 </script>
-<style>
-.carousel-caption {
-    padding: 1rem;
-    backdrop-filter: blur(3px);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-}
-
-.carousel-inner {
-    max-height: 500px;
-}
-
-.carousel-inner img {
-    height: 500px;
-    object-fit: cover;
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .carousel-inner img {
-        height: 300px;
-    }
-}
-
-.profile-picture {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* Card Title Styling */
-.card-title {
-    font-weight: bold;
-    color: #333;
-}
-
-/* Card Subtitle Styling */
-.card-subtitle {
-    font-size: 14px;
-    color: #6c757d;
-}
-
-/* Description Styling */
-.card-description {
-    font-size: 14px;
-    color: #6c757d;
-}
-
-/* Timestamp Styling */
-.card-timestamp {
-    font-size: 12px;
-    color: #999;
-}
-
-/* Button Styling */
-.btn-follow {
-    background-color: #28a745;
-    border-color: #28a745;
-    color: white;
-}
-
-.btn-message {
-    background-color: #28a745;
-    border-color: #28a745;
-    color: white;
-}
-
-/* Card Footer Styling */
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.text-decoration-none:hover {
-    color: #0d6efd;
-    /* Bootstrap primary blue */
-    text-decoration: underline;
-}
-
-/* Hover effect for dropdown buttons */
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    /* Slightly darker blue */
-    border-color: #0a58ca;
-}
-
-.custom-border {
-    border: 2px solid #4edce2;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border-radius: 25px;
-    box-shadow: #777 0px 25px 20px -20px;
-    transition: transform 1s ease, box-shadow 0.3s ease;
-    background-color: #4edce2;
-}
-
-.btn:hover {
-
-    background-color: #093334;
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0px 10px 15px -5px #555;
-}
-
-.image {
-    width: 200%;
-    height: 100%;
-}
-
-.dorm-card {
-    width: 100%;
-    /* Ensure full width within the column */
-    height: 500px;
-    background-color: #fff;
-    border: 2px solid #4edce2;
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 16px;
-}
-
-.card-img-top {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-}
-
-.card-header-style {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.card-header h3 {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
-
-.card-body-style {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.location {
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-}
-
-.description {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.5;
-}
-
-.features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.feature-btn {
-    background-color: transparent;
-    border: 1px solid #ccc;
-    color: #333;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.feature-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.view-details-btn {
-    background-color: #007bff;
-    color: #fff;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-</style>

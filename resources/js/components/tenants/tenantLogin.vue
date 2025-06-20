@@ -1,16 +1,7 @@
 <template>
 
-    <form @submit.prevent="LandlordLogin">
-        <div :class="['container-toast mt-5', { show: toaster }]" v-show="toaster">
-            <!-- Toast Container -->
-            <div :class="['toast-child', `bg-${toastColor}`]">
-                <div class="toast-body d-flex justify-content-between align-items-center text-white fw-bold py-3 px-4">
-                    <span class="text-wrap">{{ this.messageToaster }}</span>
-                    <button type="button" class="btn-close btn-close-white ms-3" @click="ExitToaster"
-                        aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
+    <form @submit.prevent="TenantLogin">
+
         <div class="row  m-2">
             <div class="mt-3">
                 <label for="email" class="form-label">Email</label>
@@ -50,6 +41,16 @@
 
 
     </form>
+    <div :class="['container-toast mt-5', { show: toaster }]" v-show="toaster">
+        <!-- Toast Container -->
+        <div :class="['toast-child', `bg-${toastColor}`]">
+            <div class="toast-body d-flex justify-content-between align-items-center text-white fw-bold py-3 px-4">
+                <span class="text-wrap">{{ this.messageToaster }}</span>
+                <button type="button" class="btn-close btn-close-white ms-3" @click="ExitToaster"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 
 </template>
 <script>
@@ -67,7 +68,7 @@ export default {
 
     },
     methods: {
-        async LandlordLogin() {
+        async TenantLogin() {
             if (this.loginValidation()) {
 
                 const formData = new FormData();
@@ -84,7 +85,6 @@ export default {
                         const userId = response.data.tenant.id;
                         const userName = response.data.tenant.firstname;
                         localStorage.setItem('tenant', JSON.stringify(response.data.tenant));
-                        alert(userId);
                         window.location.href = `/homepage/${userId}`;
                         return true;
                     }

@@ -1,172 +1,201 @@
 <template>
-    <div class="p-4 mt-4">
-        <!-- Header -->
+    <Loader ref="loader" />
+    <Toastcomponents ref="toast" />
 
-        <!-- Search Bar -->
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search Tenants" v-model="searchQuery"
-                @keyup="filterTenants" />
+    <div class="container py-4">
+        <!-- Card Container -->
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class=" text-black rounded-top-4">
+                <h5 class="mb-0 ">🏠 Tenant Screening</h5>
+            </div>
+            <div class="card-body">
+
+                <!-- Search & Filters -->
+                <input type="text" v-model="searchQuery" placeholder="🔍 Search tenants..."
+                    class="form-control shadow-sm mb-4" @keyup="filterTenants" />
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-2">
+                        <select id="roomSelect" class="form-select shadow-sm">
+                            <option selected disabled>Select a room</option>
+                            <option value="101">Room 101</option>
+                            <option value="102">Room 102</option>
+                            <option value="103">Room 103</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <select id="dormSelect" class="form-select shadow-sm">
+                            <option selected disabled>Select a dormitory</option>
+                            <option value="Dorm A">Dorm A</option>
+                            <option value="Dorm B">Dorm B</option>
+                            <option value="Dorm C">Dorm C</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive shadow-sm rounded">
+                    <table class="table table-bordered  align-middle mb-0 text-center">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Firstname</th>
+                                <th>Lastname</th>
+                                <th>Email</th>
+                                <th>Dorm</th>
+                                <th>Room No</th>
+                                <th>Payment Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="tenant in filteredTenants" :key="tenant.tenantId">
+                                <td><strong>{{ tenant.tenantscreening_id }}</strong></td>
+                                <td>{{ tenant.firstname }}</td>
+                                <td>{{ tenant.lastname }}</td>
+                                <td>{{ tenant.contact_email }}</td>
+                                <td>{{ tenant.dorm?.dorm_name }}</td>
+                                <td>{{ tenant.room?.room_number }}</td>
+                                <td>{{ tenant.payment_type }}</td>
+                                <td>
+                                    <span class="badge" :class="{
+                                        'bg-success': tenant.status === 'Approved',
+                                        'bg-danger': tenant.status === 'Not Approved',
+                                        'bg-warning text-dark': tenant.status !== 'Approved' && tenant.status !== 'Not Approved'
+                                    }">{{ tenant.status }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            @click="openScreeningModal(tenant.tenantscreening_id)">Update</button>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            @click="deleteScreening(tenant.tenantscreening_id)">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
 
-        <!-- Table -->
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>Tenant ID</th>
-                    <th>Tenant Name</th>
-                    <th>Email</th>
-                    <th>Dorm Name</th>
-                    <th>Room No</th>
-                    <th>Move-In Date</th>
-                    <th>Payment Status</th>
-                    <th>Application Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="tenant in filteredTenants" :key="tenant.id">
-                    <td>{{ tenant.tenantId }}</td>
-                    <td>{{ tenant.name }}</td>
-                    <td>{{ tenant.email }}</td>
-                    <td>{{ tenant.dormName }}</td>
-                    <td>{{ tenant.roomNo }}</td>
-                    <td>{{ tenant.moveInDate }}</td>
-                    <td>{{ tenant.paymentStatus }}</td>
-                    <td>{{ tenant.applicationStatus }}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" @click="VisibleModalApproval = true">Update</button>
-                        <button class="btn btn-sm btn-danger ms-2" @click="VisibleDeleteModal = true">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <!--Modal Tenant Appoval-->
-        <!-- Use v-if to render the modal only if needed -->
-        <div v-if="VisibleModalApproval" class="modal d-block" tabindex="-1" id="tenantModal"
-            style="background: rgba(0,0,0,0.5)">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="tenantModalLabel">Tenant Information</h5>
-                        <button type="button" class="btn-close" @click="VisibleModalApproval = false"
-                            aria-label="Close"></button>
+        <!-- Approval Modal -->
+        <div v-if="VisibleModalApproval" class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);"
+            tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content shadow rounded-4">
+                    <div class="modal-header bg-white border-0">
+                        <h5 class="modal-title text-primary">🧾 Tenant Profile</h5>
+                        <button type="button" class="btn-close" @click="VisibleModalApproval = false"></button>
                     </div>
-                    <div class="modal-body">
-                        <!-- Tenant Image -->
-                        <div class="text-center mb-3">
-                            <img :src="tenant.image || 'https://via.placeholder.com/150'" alt="Tenant Profile Picture"
-                                class="rounded-circle img-fluid" style="max-width: 150px" />
-                            <p class="mt-2 text-center">{{ tenant.id }}</p>
+
+                    <div class="modal-body px-4">
+                        <div class="text-center mb-4">
+                            <img :src="selectedtenant.studentpicture_id" class="rounded-circle border shadow-sm"
+                                style="width: 120px; height: 120px; object-fit: cover;" />
+                            <p class="mt-2">
+                                <span class="badge rounded-pill px-3 py-2" :class="{
+                                    'bg-success text-white': selectedtenant.status === 'Approved',
+                                    'bg-danger text-white': selectedtenant.status === 'Not Approved',
+                                    'bg-warning text-dark': selectedtenant.status !== 'Approved' && selectedtenant.status !== 'Not Approved'
+                                }">{{ selectedtenant.status }}</span>
+                            </p>
                         </div>
 
-                        <!-- Tenant Details -->
-                        <div class="row">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <p><strong>Firstname:</strong> {{ tenant.firstname }}</p>
-                                <p><strong>Email:</strong> <a :href="`mailto:${tenant.email}`">{{ tenant.email }}</a>
-                                </p>
-                                <p><strong>Address:</strong> {{ tenant.address }}</p>
-                                <p><strong>School:</strong> {{ tenant.school }}</p>
+                                <p><strong>First Name:</strong> {{ selectedtenant.firstname }}</p>
+                                <p><strong>Age:</strong> {{ selectedtenant.age }}</p>
+                                <p><strong>Email:</strong> {{ selectedtenant.contact_email }}</p>
+                                <p><strong>Address:</strong> {{ selectedtenant.address }}</p>
+                                <p><strong>Room #:</strong> {{ selectedtenant.room_number }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Lastname:</strong> {{ tenant.lastname }}</p>
-                                <p><strong>Contact Number:</strong> {{ tenant.contactNumber }}</p>
-                                <p><strong>Payment Type:</strong> {{ tenant.paymentType }}</p>
-                                <p><strong>Course and Year:</strong> {{ tenant.courseYear }}</p>
+                                <p><strong>Last Name:</strong> {{ selectedtenant.lastname }}</p>
+                                <p><strong>Gender:</strong> {{ selectedtenant.gender }}</p>
+                                <p><strong>Contact:</strong> {{ selectedtenant.contact_number }}</p>
+                                <p><strong>Dorm:</strong> {{ selectedtenant.dorm_name }}</p>
+                                <p><strong>Price:</strong> ₱{{ Number(selectedtenant.price).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2
+                                }) }}</p>
                             </div>
                         </div>
+
+                        <div class="text-center mt-4">
+                            <p><strong>Payment Type:</strong> {{ selectedtenant.payment_type }}</p>
+                            <img :src="selectedtenant.payment_image" class="img-thumbnail rounded shadow-sm"
+                                style="width: 200px; height: 200px; object-fit: cover;" />
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-primary" @click="approveTenant">Approve</button>
-                        <button type="button" class="btn btn-outline-secondary" @click="notApproveTenant">Not
-                            Approve</button>
+
+                    <div class="modal-footer justify-content-between bg-light border-top-0">
+                        <button class="btn btn-outline-primary">Message Tenant</button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-success" @click="approveTenant"
+                                :disabled="selectedtenant.status === 'Approved'">✅ Approve</button>
+                            <button class="btn btn-outline-danger" @click="notApproveTenant"
+                                :disabled="selectedtenant.status === 'Not Approved'">❌ Not Approve</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!--End Appoval Modal-->
-        <!--DElete Modal-->
-        <div v-if="VisibleDeleteModal" class="modal fade show d-block w-100" tabindex="-1"
-            style="background-color: rgba(0,0,0,0.5);" @click.self="VisibleDeleteModal = false">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content shadow-lg border-0 rounded-4">
-                    <div class="modal-header bg-danger text-white rounded-top-4">
-                        <h5 class="modal-title fw-bold">Delete Confirmation</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="VisibleDeleteModal = false"
-                            aria-label="Close"></button>
+        <!-- Delete Modal -->
+        <div v-if="VisibleDeleteModal" class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);"
+            tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow rounded-3">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="btn-close btn-close-white"
+                            @click="VisibleDeleteModal = false"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
-                        <p class="fs-5">Are you sure you want to delete this Room? This action cannot be undone.</p>
+                        <i class="bi bi-exclamation-triangle-fill text-warning display-4 mb-3"></i>
+                        <p class="fs-5">Are you sure you want to delete this tenant? This action cannot be undone.</p>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-outline-secondary px-4"
-                            @click="VisibleDeleteModal = false">Cancel</button>
-                        <button type="button" class="btn btn-danger px-4" @click="confirmDelete()">Delete</button>
+                        <button class="btn btn-secondary px-4" @click="VisibleDeleteModal = false">Cancel</button>
+                        <button class="btn btn-danger px-4" @click="confirmDelete">Delete</button>
                     </div>
                 </div>
             </div>
         </div>
-        <!--End Delete MOdal-->
+
     </div>
+
+    <Modalconfirmation ref="modal" />
 </template>
 <script>
+import axios from 'axios';
+import Toastcomponents from '@/components/Toastcomponents.vue';
+import Loader from '@/components/loader.vue';
+import Modalconfirmation from '@/components/modalconfirmation.vue';
 export default {
+    components: {
+        Toastcomponents,
+        Loader,
+        Modalconfirmation
+
+
+    },
     data() {
         return {
             VisibleModalApproval: false,
             VisibleDeleteModal: false,
-            tenants: [
-                {
-                    tenantId: 1,
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    dormName: "Dorm A",
-                    roomNo: "101",
-                    moveInDate: "2023-01-15",
-                    paymentStatus: "Paid",
-                    applicationStatus: "Approved",
-                },
-                {
-                    tenantId: 2,
-                    name: "Jane Smith",
-                    email: "jane.smith@example.com",
-                    dormName: "Dorm B",
-                    roomNo: "202",
-                    moveInDate: "2023-02-01",
-                    paymentStatus: "Pending",
-                    applicationStatus: "Pending",
-                },
-                {
-                    tenantId: 3,
-                    name: "Alice Johnson",
-                    email: "alice.johnson@example.com",
-                    dormName: "Dorm C",
-                    roomNo: "303",
-                    moveInDate: "2023-03-10",
-                    paymentStatus: "Paid",
-                    applicationStatus: "Approved",
-                },
-            ],
-            tenant: {
-                id: "1885598713",
-                firstname: "Lance",
-                lastname: "Monsanto",
-                email: "nilnauer@gmail.com",
-                address: "Yeti Lilisan Cebu City",
-                paymentType: "Cash",
-                contactNumber: "09232424628",
-                school: "UCLM",
-                courseYear: "BSIT '23",
-            },
+            tenants: [],
+            selectedtenant: [],
+            selecttenant_id: '',
+            tenant: {},
             searchQuery: "",
             filteredTenants: [],
+            landlord_id: '',
         };
     },
-    mounted() {
-        this.filteredTenants = this.tenants; // Initialize filtered list with all tenants
-    },
+
     methods: {
         filterTenants() {
             // Filter tenants based on the search query
@@ -177,43 +206,169 @@ export default {
                 );
             });
         },
-        approveTenant() {
-            alert("Tenant approved!");
-            // Add logic to handle approval (e.g., API call)
+        async fetchtenantScreening() {
+            this.$refs.loader.loading = true;
+
+            try {
+                const response = await axios.get('/tenant-screening-list', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                this.$refs.loader.loading = false;
+
+                this.filteredTenants = response.data.screening || [];
+                console.log(response.data.screening);
+
+
+            } catch (error) {
+                this.$refs.loader.loading = false;
+
+                console.error('Error fetching rooms:', error);
+            }
         },
-        notApproveTenant() {
-            alert("Tenant not approved!");
-            // Add logic to handle rejection (e.g., API call)
+        async openScreeningModal(tenant_id) {
+            this.$refs.loader.loading = true;
+
+            this.selecttenant_id = tenant_id;
+            try {
+                const response = await axios.get(`/view-tenant/${this.selecttenant_id}`);
+                this.selectedtenant = response.data.tenant;
+                this.VisibleModalApproval = true;
+                this.$refs.loader.loading = false;
+
+
+            }
+            catch (error) {
+                this.$refs.loader.loading = false;
+
+                console.error('Error fetching tenant data:', error);
+
+            }
+        },
+        async approveTenant() {
+            const confirmed = await this.$refs.modal.show({
+                title: 'Confirm Approval Tenant',
+                message: 'Approve this tenant’s application? This will reserve a room for them.',
+                functionName: 'Confirm'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
+                return;
+            }
+
+            this.$refs.loader.loading = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('tenant_screening_id', this.selecttenant_id);
+
+                const response = await axios.post('/approve-tenant', formData, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    }
+                });
+
+                if (response.data.status === "success") {
+                    this.$refs.toast.showToast(response.data.message, 'success');
+                    this.VisibleModalApproval = false;
+                    this.fetchtenantScreening();
+                } else if (response.data.status === "error") {
+                    this.$refs.toast.showToast(response.data.message || 'Approval failed.', 'error');
+                }
+            } catch (error) {
+                this.$refs.loader.loading = false;
+                this.VisibleModalApproval = false;
+                const errorMsg = error.response.data?.message || 'Failed to approve tenant.';
+                this.$refs.toast.showToast(errorMsg, 'danger');
+            } finally {
+                this.$refs.loader.loading = false;
+            }
+        },
+
+
+        async notApproveTenant() {
+            const confirmed = await this.$refs.modal.show({
+                title: 'Confirm Tenant Approval',
+                message: 'Are you sure you want to decline this tenant’s application?',
+                functionName: 'Confirm'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('tenant_screening_id', this.selecttenant_id);
+
+                const response = await axios.post('/not-approve-tenant', formData, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    }
+                });
+                if (response.data.status === "success") {
+                    this.$refs.toast.showToast(response.data.message, 'success');
+                    this.$refs.loader.loading = false;
+                    this.VisibleModalApproval = false;
+                    this.fetchtenantScreening();
+
+                }
+
+
+                // Optional: trigger a success alert or reload data
+            } catch (error) {
+                console.error('Error approving tenant:', error);
+                // Optional: show a user-friendly error message
+            }
+        },
+        async deleteScreening(tenant_id) {
+            this.selecttenant_id = tenant_id;
+
+            const confirmed = await this.$refs.modal.show({
+                title: 'Delete Room?',
+                message: 'This will permanently remove the room. Proceed?',
+                functionName: 'Delete Room'
+            });
+
+            if (!confirmed) {
+                this.$refs.loader.loading = false;
+                return;
+            }
+            this.$refs.loader.loading = true; // Show loading indicator
+            try {
+                const response = await axios.delete(`/delete-screening/${this.selecttenant_id}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                if (response.data.status === "success") {
+                    this.fetchtenantScreening();
+
+                    this.$refs.loader.loading = false;
+
+                    this.$refs.toast.showToast(response.data.message, 'success');
+
+                }
+                else {
+                    this.$refs.toast.showToast(response.data.message, 'error');
+                }
+            }
+            catch (error) {
+                console.error('Error deleting room:', error);
+                this.$refs.toast.showToast('Failed to delete room.', 'error');
+            } finally {
+                this.$refs.loader.loading = false; // Hide loading indicator
+
+            }
         },
     },
+    mounted() {
+        this.fetchtenantScreening();
+    }
 };
 </script>
 <style scoped>
 /* Optional custom styles */
-.container {
-    max-width: 800px;
-}
-
-.input-group {
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-}
-
-.table {
-    font-size: 0.9rem;
-}
-
-.table th {
-    background-color: #f8f9fa;
-}
-
-.table td,
-.table th {
-    vertical-align: middle;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
 </style>
